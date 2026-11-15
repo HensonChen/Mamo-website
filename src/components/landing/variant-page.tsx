@@ -1,3 +1,4 @@
+import { AttributionCapture } from "@/components/attribution-capture";
 import { Answers } from "@/components/landing/answers";
 import { Closing } from "@/components/landing/closing";
 import { Hero } from "@/components/landing/hero";
@@ -14,6 +15,7 @@ import type { Variant } from "@/content/variants";
 export function VariantPage({ variant }: { variant: Variant }) {
   return (
     <>
+      <AttributionCapture />
       <JsonLd data={variantStructuredData(variant)} />
       <Hero variant={variant} />
       <Storyboard variant={variant} />

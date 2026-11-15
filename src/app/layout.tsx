@@ -5,6 +5,7 @@ import { siteGraph } from "@/lib/structured-data";
 import { JsonLd } from "@/components/json-ld";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { MetaPixel } from "@/components/meta-pixel";
 import "./globals.css";
 
 // One typeface for everything. Designed by the Braille Institute for
@@ -91,6 +92,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <Footer />
         <JsonLd data={siteGraph()} />
+        <MetaPixel />
       </body>
     </html>
   );
