@@ -1,7 +1,7 @@
 import { createFileProvider } from "@/lib/waitlist/providers/file";
 import type { WaitlistProvider } from "@/lib/waitlist/types";
 
-export type { WaitlistEntry, WaitlistProvider } from "@/lib/waitlist/types";
+export type { BotHit, WaitlistEntry, WaitlistProvider } from "@/lib/waitlist/types";
 
 /**
  * Pick the storage provider from the environment.
@@ -16,7 +16,7 @@ export type { WaitlistEntry, WaitlistProvider } from "@/lib/waitlist/types";
  *     POST to https://app.loops.so/api/v1/contacts/create with LOOPS_API_KEY
  *   WAITLIST_PROVIDER=postgres -> insert into a `waitlist` table via your driver
  *
- * Each provider only needs to implement `WaitlistProvider.add`.
+ * Each provider implements `add`, `has` (duplicate check) and `logBot` (honeypot log).
  */
 export function getWaitlistProvider(): WaitlistProvider {
   const kind = process.env.WAITLIST_PROVIDER ?? "file";

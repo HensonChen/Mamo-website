@@ -1,10 +1,29 @@
 import { siteConfig } from "@/config/site";
 
+/** The helper's face, as inline SVG for Satori. */
+function HelperMark({ size }: { size: number }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width={size} height={size}>
+      <circle cx="50" cy="50" r="48" fill="#2b5fc4" />
+      <rect x="31" y="36" width="12" height="26" rx="6" fill="#fff" />
+      <rect x="57" y="36" width="12" height="26" rx="6" fill="#fff" />
+    </svg>
+  );
+}
+
 /**
  * Shared layout for generated Open Graph images (next/og / Satori).
  * Inline styles only; Satori does not read Tailwind classes.
  */
-export function OgCard({ headline, kicker }: { headline: string; kicker: string }) {
+export function OgCard({
+  headline,
+  kicker,
+  cta = "Join the waitlist",
+}: {
+  headline: string;
+  kicker: string;
+  cta?: string;
+}) {
   return (
     <div
       style={{
@@ -12,8 +31,8 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
         height: "100%",
         display: "flex",
         padding: "64px 72px",
-        background: "#fbfaf7",
-        color: "#244b43",
+        background: "#eef4fc",
+        color: "#1b2533",
         fontFamily: "sans-serif",
       }}
     >
@@ -27,13 +46,9 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="64" height="64">
-            <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-            <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-            <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
-          </svg>
+          <HelperMark size={64} />
           <div style={{ fontSize: 40, fontWeight: 700 }}>{siteConfig.name}</div>
-          <div style={{ fontSize: 28, color: "#4c5a57", marginLeft: 12 }}>{kicker}</div>
+          <div style={{ fontSize: 28, color: "#4b5768", marginLeft: 12 }}>{kicker}</div>
         </div>
 
         <div
@@ -53,15 +68,15 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: 26,
-            color: "#4c5a57",
+            color: "#4b5768",
           }}
         >
           <div>{siteConfig.tagline}</div>
           <div
             style={{
-              background: "#7c3c5c",
+              background: "#2b5fc4",
               color: "#ffffff",
-              borderRadius: 999,
+              borderRadius: 20,
               padding: "14px 28px",
               fontWeight: 700,
               flexShrink: 0,
@@ -69,16 +84,14 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
               marginLeft: 24,
             }}
           >
-            Join the waitlist
+            {cta}
           </div>
         </div>
       </div>
 
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="300" height="300" style={{ alignSelf: "center" }}>
-        <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-        <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-        <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
-      </svg>
+      <div style={{ display: "flex", alignSelf: "center" }}>
+        <HelperMark size={300} />
+      </div>
     </div>
   );
 }

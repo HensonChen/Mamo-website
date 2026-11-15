@@ -1,31 +1,32 @@
 @import "tailwindcss";
 
 /*
- * Design tokens.
- * One typeface (Atkinson Hyperlegible Next, designed for low-vision readers).
- * Paper white, two greens, one berry accent. No gradients, no decorative cards.
+ * Design tokens, taken from the WireframeDemoStyled2 mockup.
+ * One typeface (Atkinson Hyperlegible, designed for low-vision readers),
+ * a calm blue page, white surfaces, one blue for every primary action.
  */
 @theme {
-  --color-paper: #fbfaf7;
-  --color-sage: #e6ede6;
-  --color-sage-deep: #c9d6cb;
-  --color-pine: #244b43;
-  --color-pine-deep: #17352f;
-  --color-moss: #3e6b5e;
-  --color-berry: #7c3c5c;
-  --color-berry-deep: #5e2b45;
-  --color-ink: #1e2a28;
-  --color-ink-soft: #4c5a57;
+  --color-sky: #eef4fc;
+  --color-halo: #dce9fa;
+  --color-azure: #2b5fc4;
+  --color-azure-deep: #1f4fa8;
+  --color-ink: #1b2533;
+  --color-ink-soft: #4b5768;
+  --color-line: #c3d7f2;
+  --color-chip: #f1f3f6;
+  --color-edge: #7a8799;
+  --color-ok: #1e6b47;
+  --color-ok-bg: #e9f5ee;
+  --color-ok-line: #b5dbc4;
+  --color-alert: #a02424;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-card: 0 1px 0 rgb(30 42 40 / 0.06), 0 16px 40px -24px rgb(36 75 67 / 0.35);
-
-  --text-display: 3.25rem;
-  --text-display--line-height: 1.05;
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.1;
   --text-display--letter-spacing: -0.02em;
-  --text-display-lg: 4.5rem;
-  --text-display-lg--line-height: 1.02;
+  --text-display-lg: 3.75rem;
+  --text-display-lg--line-height: 1.05;
   --text-display-lg--letter-spacing: -0.025em;
 }
 
@@ -42,12 +43,15 @@ html {
   *::before,
   *::after {
     transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  }
+  .helper-look,
+  .helper-blink {
+    animation: none !important;
   }
 }
 
 body {
-  background-color: var(--color-paper);
+  background-color: var(--color-sky);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 1.125rem;
@@ -58,13 +62,13 @@ body {
 
 /* Keyboard focus: thick, high-contrast, consistent. */
 :focus-visible {
-  outline: 3px solid var(--color-berry);
+  outline: 3px solid var(--color-azure-deep);
   outline-offset: 3px;
   border-radius: 0.5rem;
 }
 
 ::selection {
-  background: var(--color-sage-deep);
+  background: var(--color-line);
 }
 
 /* Native <details>: hide the default marker, rotate the chevron when open. */
@@ -76,4 +80,56 @@ details > summary::-webkit-details-marker {
 }
 details[open] .details-chevron {
   transform: rotate(180deg);
+}
+
+/* The helper character from the demo: eyes drift and blink. */
+@keyframes helper-look {
+  0%,
+  12% {
+    transform: translate(0, 0);
+  }
+  18%,
+  30% {
+    transform: translate(-9px, 0);
+  }
+  36%,
+  48% {
+    transform: translate(0, -8px);
+  }
+  54%,
+  66% {
+    transform: translate(9px, 0);
+  }
+  72%,
+  84% {
+    transform: translate(0, 6px);
+  }
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes helper-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+.helper-look {
+  animation: helper-look 6s ease-in-out infinite;
+}
+.helper-blink {
+  animation: helper-blink 6s infinite;
+}
+
+/* Hide the scrollbar on the swipeable storyboard row but keep it scrollable. */
+.swipe-row {
+  scrollbar-width: none;
+}
+.swipe-row::-webkit-scrollbar {
+  display: none;
 }

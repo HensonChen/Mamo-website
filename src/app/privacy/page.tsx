@@ -15,7 +15,8 @@ export default function PrivacyPage() {
         <h2>Who we are</h2>
         <p>
           {siteConfig.legalName} (&ldquo;{siteConfig.name}&rdquo;, &ldquo;we&rdquo;) is building a
-          technology care service for families and care centers. You can reach us at{" "}
+          voice and screen tech helper for older adults, their families and senior living
+          communities. You can reach us at{" "}
           {siteConfig.contactEmail}.
         </p>
       </section>
@@ -24,8 +25,8 @@ export default function PrivacyPage() {
         <h2>What we collect</h2>
         <ul>
           <li>
-            When you join the waitlist: your email address, and optionally your name, who you are
-            joining on behalf of, and an organization name.
+            When you join the waitlist: your email address, which page you used, and the optional
+            details on that page&apos;s form (such as who it is for, a community name, or your role).
           </li>
           <li>The page you signed up from and the time you signed up.</li>
           <li>Anything you choose to tell us when you email us.</li>
