@@ -66,7 +66,7 @@ export function Answers({ variant }: { variant: Variant }) {
         <h2 id="answers-heading" className="sr-only">
           Short answers
         </h2>
-        <ul className="grid gap-5 lg:grid-cols-3 lg:items-start lg:gap-6">
+        <ul className="grid gap-5 lg:grid-cols-3 lg:gap-6">
           {variant.answers.map((tile) => (
             <Tile key={tile.question} tile={tile} variant={variant} />
           ))}

@@ -18,7 +18,7 @@ export default function HomePage() {
   return (
     <section aria-labelledby="home-heading" className="py-10 sm:py-14">
       <Container className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-6">
+        <div className="min-w-0 lg:col-span-6">
           <h1 id="home-heading" className="text-display font-bold text-balance text-ink lg:text-display-lg">
             Tech help your parent can just talk to
           </h1>
@@ -42,9 +42,10 @@ export default function HomePage() {
           </ul>
         </div>
         <div className="lg:col-span-6">
+          {/* Two phones side by side must fit a 390px screen, so they are small there. */}
           <div className="flex justify-center gap-4 lg:gap-6">
-            <PhoneScreen id="explain" copy={screenCopy} className="[--s:0.45] sm:[--s:0.6] lg:[--s:0.55]" />
-            <PhoneScreen id="notice-done" copy={screenCopy} className="[--s:0.45] sm:[--s:0.6] lg:[--s:0.55]" />
+            <PhoneScreen id="explain" copy={screenCopy} className="[--s:0.38] sm:[--s:0.6] lg:[--s:0.55]" />
+            <PhoneScreen id="notice-done" copy={screenCopy} className="[--s:0.38] sm:[--s:0.6] lg:[--s:0.55]" />
           </div>
         </div>
       </Container>

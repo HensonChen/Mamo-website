@@ -14,12 +14,17 @@ export function Hero({ variant }: { variant: Variant }) {
   const { hero } = variant;
   const single = hero.screens.length === 1;
   // One phone can be larger; two phones share the column.
-  const scale = single ? "[--s:0.6] lg:[--s:0.8]" : "[--s:0.6] lg:[--s:0.55]";
+  // With outcome tiles beside it, the phone stays smaller so the tiles have room.
+  const scale = hero.outcomes
+    ? "[--s:0.6] lg:[--s:0.62]"
+    : single
+      ? "[--s:0.6] lg:[--s:0.8]"
+      : "[--s:0.6] lg:[--s:0.55]";
 
   return (
     <section aria-labelledby="hero-heading" className="pb-14 pt-8 sm:pb-20 sm:pt-12">
       <Container className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-6">
+        <div className="min-w-0 lg:col-span-6">
           <h1
             id="hero-heading"
             className="text-display font-bold text-balance text-ink lg:text-display-lg"
@@ -47,7 +52,8 @@ export function Hero({ variant }: { variant: Variant }) {
           </div>
         </div>
 
-        <div className="lg:col-span-6">
+        {/* min-w-0: a grid item must be allowed to shrink below the width of the swipe row inside it. */}
+        <div className="min-w-0 lg:col-span-6">
           <div
             className={`swipe-row flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 lg:justify-center lg:gap-6 lg:overflow-visible ${
               single ? "justify-center" : ""
