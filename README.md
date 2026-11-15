@@ -10,8 +10,8 @@ action for the waitlist. No CMS, auth or database.
 Requires Node.js 20.9 or newer (Next.js 16's minimum) and npm.
 
 ```bash
-git clone git@github.com:Phytonking/familyit-website.git
-cd familyit-website
+git clone git@github.com:HensonChen/familyit-landing.git
+cd familyit-landing
 npm install
 npm run dev      # http://localhost:3000
 npm run lint
