@@ -10,7 +10,7 @@
 
 export const siteConfig = {
   name: "FamilyIT",
-  legalName: "FamilyIT LLC", // PLACEHOLDER: registered legal entity name
+  legalName: "FamilyIT", // PLACEHOLDER: registered legal entity name
   tagline: "Tech help older adults can just talk to",
   description:
     "FamilyIT is an on-demand tech helper for older adults. They talk to it, show it their screen, and get step-by-step help, while family sets the language, the limits, and the level of help. Join the waitlist.",
@@ -44,7 +44,8 @@ export const siteConfig = {
     consumerPrice: "$25 a month", // PLACEHOLDER until pricing is final
     trialNote: "first month free", // PLACEHOLDER
     priceCompare: "Less than one tech-support visit.",
-    chargeReminder: "We'll remind you before your first charge.",
+    chargeReminder: "Join the waitlist for no charge and early access.",
+    // chargeReminder: "We'll remind you before your first charge.",
 
     /** Community pricing: no number on purpose. Shown on /senior-living only. */
     communityPricingNote:
