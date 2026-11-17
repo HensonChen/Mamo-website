@@ -17,10 +17,10 @@ export function Container({
 type ButtonVariant = "primary" | "secondary";
 
 const buttonBase =
-  "inline-flex min-h-16 items-center justify-center gap-3 rounded-[20px] px-6 text-xl font-bold transition-colors duration-150";
+  "inline-flex min-h-14 items-center justify-center gap-3 rounded-full px-7 text-xl font-bold transition-colors duration-150";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-azure text-white hover:bg-azure-deep",
+  primary: "bg-plum text-white hover:bg-plum-deep",
   secondary: "border-2 border-edge bg-white text-ink hover:bg-chip",
 };
 
@@ -44,7 +44,7 @@ export function ButtonLink({
 export function TextLink({ className = "", children, ...rest }: ComponentProps<typeof Link>) {
   return (
     <Link
-      className={`font-bold text-azure-deep underline decoration-2 underline-offset-4 hover:text-azure ${className}`}
+      className={`font-bold text-link underline decoration-2 underline-offset-4 hover:text-plum ${className}`}
       {...rest}
     >
       {children}

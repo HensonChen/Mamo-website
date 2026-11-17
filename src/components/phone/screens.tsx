@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { HelperBot, HelperFace } from "@/components/phone/helper-face";
+import { SignInForm } from "@/components/phone/sign-in-form";
+import { TypedText } from "@/components/phone/typed-text";
 
 /**
  * Static ports of the WireframeDemoStyled2 screens. Sizes, colors, radii and
@@ -142,7 +144,65 @@ export function HomeScreen({ intro }: { intro: string }) {
   );
 }
 
-const WAVE = [12, 16, 18, 22, 40, 62, 30, 44, 64, 34, 48, 26, 20, 18, 16, 12];
+/** Height, duration and delay of each bar in the listening waveform, from the demo. */
+const WAVE_BARS: [number, number, number][] = [
+  [12, 0.84, -0.12],
+  [16, 0.94, -0.19],
+  [18, 0.74, -0.48],
+  [22, 1.25, -0.96],
+  [40, 1.16, -0.27],
+  [62, 1.02, -0.33],
+  [30, 0.8, -0.13],
+  [44, 0.83, -1.11],
+  [64, 1.2, -0.97],
+  [34, 1.18, -0.23],
+  [48, 0.89, -0.75],
+  [26, 1.14, -1.03],
+  [20, 1.23, -0.1],
+  [18, 1.06, -0.81],
+  [16, 1, -0.21],
+  [12, 0.98, -0.11],
+];
+
+/** The control while the person talks: the waveform shows FamilyIT is listening. */
+function ListeningControl() {
+  return (
+    <div
+      style={{
+        flexShrink: 0,
+        height: 176,
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        paddingTop: 16,
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <span style={{ height: 92, display: "flex", alignItems: "center", gap: 8 }}>
+          {WAVE_BARS.map(([h, dur, delay], i) => (
+            <span
+              key={i}
+              className="anim"
+              style={{
+                width: 6,
+                height: h,
+                borderRadius: 3,
+                background: BLUE,
+                animation: `wave ${dur}s ease-in-out ${delay}s infinite`,
+              }}
+            />
+          ))}
+        </span>
+        <span style={{ fontSize: 20, fontWeight: 700 }}>Tap when you&rsquo;re done</span>
+      </div>
+    </div>
+  );
+}
+
+const FIRST_MESSAGE = "Oh, my car insurance company wants me to confirm something. I don\u2019t know how to do this\u2026";
+const FAMILYIT_QUESTION = "Tell me more about the message. Where did you get it?";
+const FAMILYIT_ANSWER = "I found it in your inbox. It\u2019s really from Evergreen Mutual. Do you want help with it?";
 
 /** T1: the person talks, and a live caption shows what FamilyIT heard. */
 export function ListeningScreen() {
@@ -164,29 +224,107 @@ export function ListeningScreen() {
         }}
       >
         <p style={{ margin: 0, fontSize: 28, lineHeight: 1.45, fontWeight: 700 }}>
-          &ldquo;Oh, my car insurance company wants me to confirm something. I don&apos;t know how to do this&hellip;&rdquo;
+          &ldquo;
+          <TypedText
+            text={"Oh, my car insurance company wants me to confirm something. I don\u2019t know how to do this\u2026"}
+            unit="word"
+            intervalMs={340}
+          />
+          &rdquo;
         </p>
+      </div>
+      <ListeningControl />
+    </div>
+  );
+}
+
+/** Header shared by the chat screens: Back to home, then what the conversation is about. */
+function ChatHeader() {
+  return (
+    <>
+      <div style={{ flexShrink: 0, display: "flex", alignItems: "center", padding: "56px 12px 0" }}>
+        <BackLink label="Home" />
+      </div>
+      <div style={{ flexShrink: 0, padding: "0 24px" }}>
+        <span style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.3 }}>Car insurance message</span>
+      </div>
+    </>
+  );
+}
+
+/** T2: FamilyIT asks where the message came from. */
+export function ClarifyScreen() {
+  return (
+    <div style={{ ...screenBase, background: "#FFFFFF" }}>
+      <ChatHeader />
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          padding: "20px 24px 8px",
+          overflow: "hidden",
+        }}
+      >
+        <div style={userBubble}>{FIRST_MESSAGE}</div>
+        <p style={{ margin: 0, fontSize: 24, lineHeight: 1.45, fontWeight: 700 }}>
+          <TypedText text={FAMILYIT_QUESTION} intervalMs={28} />
+        </p>
+      </div>
+      <VoiceControl>
+        <TalkButton />
+      </VoiceControl>
+    </div>
+  );
+}
+
+const fadeMask = "linear-gradient(to bottom, transparent 0, #000 40px)";
+
+/** T2a: the person answers out loud. Earlier messages fade away at the top. */
+export function AnsweringScreen() {
+  return (
+    <div style={{ ...screenBase, background: "#FFFFFF" }}>
+      <ChatHeader />
+      <div
+        style={{
+          flex: "0 1 auto",
+          maxHeight: 160,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          gap: 24,
+          padding: "20px 24px 0",
+          color: SOFT,
+          overflow: "hidden",
+          WebkitMaskImage: fadeMask,
+          maskImage: fadeMask,
+        }}
+      >
+        <div style={{ ...userBubble, color: INK }}>{FIRST_MESSAGE}</div>
+        <p style={{ margin: 0, fontSize: 24, lineHeight: 1.45 }}>{FAMILYIT_QUESTION}</p>
       </div>
       <div
         style={{
-          flexShrink: 0,
-          height: 176,
-          boxSizing: "border-box",
+          flex: 1,
+          minHeight: 0,
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          paddingTop: 16,
+          justifyContent: "center",
+          padding: "8px 32px 64px",
+          textAlign: "center",
+          overflow: "hidden",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <span style={{ height: 92, display: "flex", alignItems: "center", gap: 8 }}>
-            {WAVE.map((h, i) => (
-              <span key={i} style={{ width: 6, height: h, borderRadius: 3, background: BLUE }} />
-            ))}
-          </span>
-          <span style={{ fontSize: 20, fontWeight: 700 }}>Tap when you&rsquo;re done</span>
-        </div>
+        <p style={{ margin: 0, fontSize: 28, lineHeight: 1.45, fontWeight: 700 }}>
+          &ldquo;
+          <TypedText text={"It\u2019s an email I got this morning."} unit="word" intervalMs={340} />
+          &rdquo;
+        </p>
       </div>
+      <ListeningControl />
     </div>
   );
 }
@@ -214,15 +352,10 @@ function CarBadge() {
 
 /** T2b: FamilyIT finds the email and checks that it is real. */
 export function EmailScreen() {
-  const mask = "linear-gradient(to bottom, transparent 0, #000 40px)";
+  const mask = fadeMask;
   return (
     <div style={{ ...screenBase, background: "#FFFFFF" }}>
-      <div style={{ flexShrink: 0, display: "flex", alignItems: "center", padding: "56px 12px 0" }}>
-        <BackLink label="Home" />
-      </div>
-      <div style={{ flexShrink: 0, padding: "0 24px" }}>
-        <span style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.3 }}>Car insurance message</span>
-      </div>
+      <ChatHeader />
       <div
         style={{
           flex: 1,
@@ -237,16 +370,23 @@ export function EmailScreen() {
           maskImage: mask,
         }}
       >
-        <div style={userBubble}>Oh, my car insurance company wants me to confirm something. I don&apos;t know how to do this&hellip;</div>
-        <p style={{ margin: 0, fontSize: 24, lineHeight: 1.45, color: SOFT }}>
-          Tell me more about the message. Where did you get it?
-        </p>
-        <div style={userBubble}>It&apos;s an email I got this morning.</div>
+        <div style={userBubble}>{FIRST_MESSAGE}</div>
+        <p style={{ margin: 0, fontSize: 24, lineHeight: 1.45, color: SOFT }}>{FAMILYIT_QUESTION}</p>
+        <div style={userBubble}>It&rsquo;s an email I got this morning.</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <p style={{ margin: 0, fontSize: 24, lineHeight: 1.45, fontWeight: 700 }}>
-            I found it in your inbox. It&apos;s really from Evergreen Mutual. Do you want help with it?
+            <TypedText text={FAMILYIT_ANSWER} intervalMs={28} reserve />
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {/* The card fades in once the sentence above is typed. */}
+          <div
+            className="anim"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              animation: `fadein 0.5s ease-out ${FAMILYIT_ANSWER.length * 28}ms both`,
+            }}
+          >
             <div
               style={{
                 background: "#FFFFFF",
@@ -311,12 +451,27 @@ const demoButton: CSSProperties = {
 };
 
 /** The in-app browser: a website opens inside FamilyIT, so the person never leaves the app. */
-function WebviewShell({ bubble, children }: { bubble: string; children: ReactNode }) {
+function WebviewShell({
+  bubble,
+  motion = "talk",
+  actions,
+  children,
+}: {
+  bubble: string;
+  /** "open": the sheet slides up, then the bot and bubble appear. "talk": the bot pulses. */
+  motion?: "open" | "talk";
+  /** Buttons inside the bubble. */
+  actions?: ReactNode;
+  children: ReactNode;
+}) {
+  const open = motion === "open";
   return (
     <div style={{ ...screenBase, background: "#EEF4FC" }}>
       <div style={{ position: "absolute", inset: 0, background: "rgba(27,37,51,0.45)" }} />
       <div
+        className={open ? "anim" : undefined}
         style={{
+          animation: open ? "sheetup 0.5s cubic-bezier(.2,.8,.2,1)" : undefined,
           position: "absolute",
           top: 56,
           left: 0,
@@ -383,7 +538,10 @@ function WebviewShell({ bubble, children }: { bubble: string; children: ReactNod
           }}
         >
           <div
+            className="anim"
             style={{
+              animation: open ? "popin 0.4s ease-out 1.2s both" : "fadein 0.4s ease-out",
+              transformOrigin: "100% 100%",
               width: 336,
               boxSizing: "border-box",
               background: "#FFFFFF",
@@ -398,8 +556,15 @@ function WebviewShell({ bubble, children }: { bubble: string; children: ReactNod
           >
             <span style={{ fontSize: 16, fontWeight: 700, color: LINK_BLUE }}>FamilyIT</span>
             <p style={{ margin: 0, fontSize: 20, lineHeight: 1.5, fontWeight: 700 }}>{bubble}</p>
+            {actions}
           </div>
-          <HelperBot />
+          <HelperBot
+            animation={
+              open
+                ? "botin 0.45s cubic-bezier(.2,1.4,.4,1) 0.8s both, talk 1.2s ease-in-out 1.3s infinite"
+                : "talk 1.2s ease-in-out infinite"
+            }
+          />
         </div>
       </div>
     </div>
@@ -422,18 +587,33 @@ const fieldBox: CSSProperties = {
   fontSize: 20,
 };
 
-/** T4: FamilyIT signs in with the saved login, after the person says OK. The password is hidden. */
-export function SignInScreen({ message }: { message: string }) {
+/** T3: FamilyIT opens the insurer's website and offers to sign in. */
+export function OpenSiteScreen({ message }: { message: string }) {
   return (
-    <WebviewShell bubble={message}>
+    <WebviewShell
+      bubble={message}
+      motion="open"
+      actions={
+        <div style={{ display: "flex", gap: 12 }}>
+          <span style={{ ...demoButton, flex: 1, minWidth: 0, background: BLUE, color: "#FFFFFF" }}>Sign me in</span>
+          <span
+            style={{ ...demoButton, flex: 1, minWidth: 0, background: "#FFFFFF", color: INK, border: "2px solid #7A8799" }}
+          >
+            Not now
+          </span>
+        </div>
+      }
+    >
       <div style={{ position: "relative", flex: 1 }}>
         <span style={{ position: "absolute", top: 18, left: 24, fontSize: 26, fontWeight: 700, color: "#1F2530" }}>
           Sign in
         </span>
         <span style={{ ...fieldLabel, top: 66 }}>Email</span>
-        <div style={{ ...fieldBox, top: 94 }}>amber.lee@mail.com</div>
+        <div style={{ ...fieldBox, top: 94 }}>
+          <span style={{ color: "#8A8A8A" }}>Email</span>
+        </div>
         <span style={{ ...fieldLabel, top: 164 }}>Password</span>
-        <div style={{ ...fieldBox, top: 192, letterSpacing: 4 }}>{"\u2022".repeat(10)}</div>
+        <div style={{ ...fieldBox, top: 192 }} />
         <div
           style={{
             position: "absolute",
@@ -442,7 +622,7 @@ export function SignInScreen({ message }: { message: string }) {
             right: 24,
             height: 60,
             borderRadius: 12,
-            background: "#2A303B",
+            background: "#3B4250",
             color: "#FFFFFF",
             display: "flex",
             alignItems: "center",
@@ -451,8 +631,60 @@ export function SignInScreen({ message }: { message: string }) {
             fontWeight: 700,
           }}
         >
-          Signing in&hellip;
+          Sign in
         </div>
+      </div>
+    </WebviewShell>
+  );
+}
+
+/** T4: FamilyIT signs in with the saved login, after the person says OK. The password is hidden. */
+export function SignInScreen({ message }: { message: string }) {
+  return (
+    <WebviewShell bubble={message}>
+      <SignInForm />
+    </WebviewShell>
+  );
+}
+
+/** T6: the insurer confirms, and FamilyIT says it is done. */
+export function ConfirmedScreen({ message }: { message: string }) {
+  return (
+    <WebviewShell
+      bubble={message}
+      actions={
+        <span style={{ ...demoButton, background: BLUE, color: "#FFFFFF" }}>Back to home</span>
+      }
+    >
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 12,
+          padding: "64px 28px 0",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            width: 76,
+            height: 76,
+            borderRadius: 38,
+            background: "#1E6B47",
+            color: "#FFFFFF",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+            <path d="M5 12l5 5 9-10" />
+          </svg>
+        </div>
+        <span style={{ fontSize: 28, fontWeight: 700, color: "#1F2530" }}>Policy confirmed</span>
+        <span style={{ fontSize: 20, lineHeight: 1.5, color: "#444" }}>A copy was sent to your email.</span>
       </div>
     </WebviewShell>
   );

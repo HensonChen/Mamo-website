@@ -23,10 +23,10 @@ export function Header() {
       {siteConfig.name}
     </>
   );
-  const logoClass = "flex items-center gap-3 rounded-lg text-2xl font-bold tracking-tight text-ink";
+  const logoClass = "flex items-center gap-3 rounded-lg text-2xl font-bold tracking-tight text-pine";
 
   return (
-    <header className="border-b-2 border-line/70 bg-sky">
+    <header className="relative z-10 bg-transparent">
       <Container className="flex h-[4.5rem] items-center">
         {onSegmentPage ? (
           <span className={logoClass}>{logo}</span>

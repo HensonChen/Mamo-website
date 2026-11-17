@@ -1,28 +1,26 @@
 import { WrongDoor } from "@/components/landing/wrong-door";
-import { FaqList } from "@/components/sections/faq";
 import { Container } from "@/components/ui";
-import { WaitlistForm } from "@/components/waitlist-form";
+import { WaitlistButton } from "@/components/waitlist-button";
 import type { Variant } from "@/content/variants";
 
-/** Last section: the same signup again after the questions, so nobody has to scroll back up. */
+/** Last section: the same button again after the questions, so nobody has to scroll back up. */
 export function Closing({ variant }: { variant: Variant }) {
+  const { closing } = variant;
   return (
-    <section aria-labelledby="closing-heading" className="bg-halo py-14 sm:py-20">
-      <Container className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
-        <div className="lg:col-span-6 lg:order-2">
-          <WaitlistForm
-            variant={variant}
-            fields={variant.form.closingFields}
-            placement="closing"
-            heading={variant.form.closingHeading}
-            footer={<WrongDoor parts={variant.doorLine} />}
-          />
-        </div>
-        <div className="lg:col-span-6 lg:order-1">
-          <h2 id="closing-heading" className="mb-5 text-3xl font-bold leading-tight text-ink sm:text-4xl">
-            Questions people ask
-          </h2>
-          <FaqList faqs={variant.faqs} />
+    <section
+      id="waitlist"
+      aria-labelledby="closing-heading"
+      className="bg-pine py-[4.5rem] text-center text-paper md:py-28"
+    >
+      <Container>
+        <h2 id="closing-heading" className="mx-auto max-w-[24ch] text-h2 font-bold text-balance text-paper lg:text-h2-lg">
+          {closing.heading}
+        </h2>
+        <p className="mx-auto mt-5 max-w-[50ch] text-xl text-paper/85">{closing.sub}</p>
+        <WaitlistButton variant={variant} placement="closing" tone="dark" className="mt-10 items-center" />
+        <p className="mx-auto mt-4 max-w-[44ch] text-base text-paper/85">{closing.note}</p>
+        <div className="mx-auto mt-7 max-w-xl border-t border-paper/25 pt-5 text-lg text-paper/85">
+          <WrongDoor parts={variant.doorLine} />
         </div>
       </Container>
     </section>

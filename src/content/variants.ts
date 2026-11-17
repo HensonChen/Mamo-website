@@ -15,33 +15,30 @@ const { product } = siteConfig;
 export type ScreenId =
   | "home"
   | "listening"
+  | "clarify"
+  | "answering"
   | "email"
+  | "opensite"
   | "signin"
   | "explain"
-  | "notice-done"
+  | "confirmed"
+  | "idle"
+  | "notice-asked"
   | "notice-login"
+  | "notice-done"
   | "recap";
-
-export type IconKey = "help" | "sliders" | "lock" | "mic" | "clock" | "building" | "people" | "card";
-
-export type AnswerTile = {
-  icon: IconKey;
-  question: string;
-  answer: string;
-  /** Marks the safety tile so it is always drawn the same way. */
-  safety?: boolean;
-  /** Draws the "autonomy dial" under the answer. */
-  dial?: boolean;
-  /** Which demo notification to show under the answer, if any. */
-  screen?: ScreenId;
-};
-
-export type StoryboardStep = { screen: ScreenId; caption: string };
 
 /** One piece of the "Not you?" line: plain text, or a link to another page. */
 export type DoorPart = { text: string; href?: string };
 
-export type FormFieldKey = "email" | "whoFor" | "organization" | "residents" | "role" | "offerModel";
+export type HeroImage = {
+  src: string;
+  alt: string;
+  /** CSS object-position on a wide screen, where the photo sits behind the copy. */
+  position: string;
+  /** CSS object-position for the picture shown under the copy on a phone. */
+  mobilePosition: string;
+};
 
 export type Variant = {
   id: SegmentId;
@@ -53,45 +50,49 @@ export type Variant = {
   hero: {
     headline: string;
     lede: string;
-    /** Submit button text. */
+    /** Button text. */
     cta: string;
-    /** Price or pricing lines shown next to the button. */
+    /** Price or pricing lines shown above the button. */
     priceLines: string[];
-    /** Which demo screens sit beside the form. */
-    screens: ScreenId[];
-    /** Extra tiles shown beside the phone on /senior-living. */
-    outcomes?: string[];
+    image: HeroImage;
+  };
+  /** The slogan and the three numbered points under the hero. */
+  why: { slogan: string; points: [string, string, string] };
+  howItWorks: {
+    heading: string;
+    /** "solo": one phone. "family": the parent's phone and the family member's phone. */
+    mode: "solo" | "family";
+    /** Four labels, one per step. */
+    steps: [string, string, string, string];
   };
   /** Wording for the helper screens, so they fit who is looking at the page. */
   screenCopy: {
     homeIntro: string;
+    openSiteMessage: string;
     signInMessage: string;
+    confirmedMessage: string;
     recapWho: string;
     recapAction: string;
-    noticeDoneTitle: string;
-    noticeDoneBody: string;
+    noticeAskedTitle: string;
+    noticeAskedBody: string;
     noticeLoginTitle: string;
     noticeLoginBody: string;
+    noticeDoneTitle: string;
+    noticeDoneBody: string;
   };
-  storyboard: { heading: string; steps: StoryboardStep[] };
-  answers: AnswerTile[];
   faqs: { question: string; answer: string }[];
-  form: {
+  closing: {
     heading: string;
-    closingHeading: string;
-    emailLabel: string;
-    /** Fields drawn in the hero form and in the closing form. */
-    heroFields: FormFieldKey[];
-    closingFields: FormFieldKey[];
+    sub: string;
+    cta: string;
     note: string;
   };
   doorLine: DoorPart[];
 };
 
-const consumerPriceLines = [
-  `${product.consumerPrice}, ${product.trialNote}. ${product.priceCompare}`,
-  product.chargeReminder,
-];
+const consumerPriceLines = [`${product.consumerPrice}, ${product.trialNote}.`];
+
+const closingNote = siteConfig.waitlist.privacyNote;
 
 export const variants: Record<SegmentId, Variant> = {
   families: {
@@ -101,55 +102,53 @@ export const variants: Record<SegmentId, Variant> = {
     meta: {
       title: "Be their family, not their help desk",
       description:
-        "FamilyIT helps your parent with passwords, portals, and bills, day or night. You set the language and the limits, and get a short note when it's done. Join the waitlist.",
+        "FamilyIT helps your parent with technology issues, day or night. You get a short note when it's done. Stay close and worry less. Join the waitlist.",
     },
     hero: {
       headline: "Be their family, not their help desk.",
-      lede: "FamilyIT helps your parent with passwords, portals, and bills, day or night. You get a short note when it's done.",
+      lede: "FamilyIT helps your parent with technology issues, day or night. You get a short note when it's done. Stay close and worry less, for both of you.",
       cta: "Join the waitlist",
       priceLines: consumerPriceLines,
-      screens: ["explain", "notice-done"],
+      image: {
+        src: "/images/hero-families.jpg",
+        alt: "A woman smiling at her phone in a bright kitchen, with a photo of her mother on the shelf behind her.",
+        position: "85% 30%",
+        mobilePosition: "75% 30%",
+      },
     },
-    screenCopy: {
-      homeIntro: "Henson set me up for you.",
-      signInMessage: "Signing you in with the login Henson saved.",
-      recapWho: "Mom",
-      recapAction: "Call Mom",
-      noticeDoneTitle: "Mom confirmed her updated car insurance policy.",
-      noticeDoneBody: "No action needed from you.",
-      noticeLoginTitle: "Mom used the insurance login you saved.",
-      noticeLoginBody: "With her OK, she's now signed in to Evergreen.",
-    },
-    storyboard: {
-      heading: "See it help",
-      steps: [
-        { screen: "listening", caption: "Mom asks out loud" },
-        { screen: "email", caption: "It checks the email is real" },
-        { screen: "signin", caption: "It signs her in, with her OK" },
-        { screen: "recap", caption: "You get a summary" },
+    why: {
+      slogan: "Less worrying. More time together.",
+      points: [
+        "Help seniors with everyday tech issues.",
+        "Families get real time notifications.",
+        "Peace of mind, with you in control.",
       ],
     },
-    answers: [
-      {
-        icon: "help",
-        question: "What does it help with?",
-        answer: "Logins, patient portals, bills, and renewal notices. Your parent just talks, and FamilyIT shows each step.",
-      },
-      {
-        icon: "sliders",
-        question: "How do I stay in control?",
-        answer:
-          "You choose the language, the websites it may open, and how much it does alone: from \u201CMom decides, I'm told\u201D to \u201CI approve first.\u201D",
-        dial: true,
-      },
-      {
-        icon: "lock",
-        question: product.safety.question,
-        answer: product.safety.families,
-        safety: true,
-        screen: "notice-login",
-      },
-    ],
+    howItWorks: {
+      heading: "How it works",
+      mode: "family",
+      steps: [
+        "Mom asks for help, just by talking",
+        "You get a heads-up she's getting help",
+        "You're told when your login is used",
+        "Done. You get the recap",
+      ],
+    },
+    screenCopy: {
+      homeIntro: "I\u2019m FamilyIT, your tech helper. Henson set me up for you.",
+      openSiteMessage:
+        "I opened Evergreen\u2019s website for you. Henson saved your login. Want me to sign you in?",
+      signInMessage: "Signing you in with the login Henson saved.",
+      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Henson know.",
+      recapWho: "Mom",
+      recapAction: "Call Mom",
+      noticeAskedTitle: "Mom is getting help",
+      noticeAskedBody: "Mom asked FamilyIT about a message from her car insurance.",
+      noticeLoginTitle: "Mom used the insurance login you saved.",
+      noticeLoginBody: "With her OK, she\u2019s now signed in to Evergreen.",
+      noticeDoneTitle: "Mom confirmed her updated car insurance policy.",
+      noticeDoneBody: "No action needed from you.",
+    },
     faqs: [
       {
         question: "Will I see everything my parent does?",
@@ -157,27 +156,24 @@ export const variants: Record<SegmentId, Variant> = {
           "You see a summary of what FamilyIT helped with. Your parent is told what is shared, and setup starts with a conversation about it.",
       },
       {
-        question: "What if it makes a mistake?",
+        question: "Can I be involved even though I live far away?",
         answer:
-          "FamilyIT guides and explains. For sensitive steps like payments or forms, it asks your parent to confirm, and can ask you to approve, depending on the level you choose.",
+          "Yes. You can set things up and receive updates, while your parent handles their own day-to-day. How involved you are is up to your parent.",
       },
       {
-        question: "Which languages does it speak?",
-        answer: `${product.languagesNote}. You pick your parent's language when you set it up.`,
+        question: "What if it makes a mistake?",
+        answer:
+          "FamilyIT guides and explains each step. For sensitive steps like payments or forms, it asks your parent to confirm, and it can ask you to approve, depending on the level you choose.",
       },
     ],
-    form: {
-      heading: "Join the waitlist",
-      closingHeading: "Get your evenings back",
-      emailLabel: "Your email",
-      heroFields: ["email", "whoFor"],
-      closingFields: ["email", "whoFor"],
-      note: "Joining is free. No card needed.",
+    closing: {
+      heading: "Be first to try FamilyIT.",
+      sub: `${product.launchWindow}.`,
+      cta: "Join the waitlist",
+      note: closingNote,
     },
     doorLine: [
-      { text: "Looking for help for yourself? " },
-      { text: "For me", href: "/seniors" },
-      { text: ". Run a senior living community? " },
+      { text: "Run a senior living community? " },
       { text: "For my community", href: "/senior-living" },
       { text: "." },
     ],
@@ -188,64 +184,65 @@ export const variants: Record<SegmentId, Variant> = {
     path: "/seniors",
     label: "For me",
     meta: {
-      title: "Tech help whenever you need it. Just talk.",
+      title: "Get tech help whenever you need it, just by talking",
       description:
-        "Tap one button and say what's wrong. FamilyIT shows you each step with passwords, bills, and appointments, so you don't have to keep asking others. Join the waitlist.",
+        "Tap one button and say what's wrong. FamilyIT helps you get things done on your own, step by step. Join the waitlist.",
     },
     hero: {
-      headline: "Tech help whenever you need it. Just talk.",
-      lede: "Tap one button and say what's wrong. FamilyIT shows you each step.",
+      headline: "Get tech help whenever you need it, just by talking.",
+      lede: "FamilyIT helps you get things done on your own, step by step. Just tap one button and say what's wrong.",
       cta: "Join the waitlist",
       priceLines: consumerPriceLines,
-      screens: ["home"],
+      image: {
+        src: "/images/hero-seniors.jpg",
+        alt: "An older woman talking to her phone from an armchair in a bright living room.",
+        position: "60% 25%",
+        mobilePosition: "55% 25%",
+      },
     },
-    screenCopy: {
-      homeIntro: "I'm FamilyIT, your tech helper.",
-      signInMessage: "Signing you in with your saved login.",
-      recapWho: "You",
-      recapAction: "Done",
-      noticeDoneTitle: "You confirmed your updated car insurance policy.",
-      noticeDoneBody: "All done.",
-      noticeLoginTitle: "FamilyIT signed you in.",
-      noticeLoginBody: "With your OK.",
-    },
-    storyboard: {
-      heading: "See it help",
-      steps: [
-        { screen: "listening", caption: "I ask out loud" },
-        { screen: "email", caption: "It checks my email is real" },
-        { screen: "signin", caption: "It signs me in, with my OK" },
-        { screen: "explain", caption: "I tap Confirm. Done." },
+    why: {
+      slogan: "You don't have to be techy to get things done.",
+      points: [
+        "Just talk, no typing needed.",
+        "Get help anytime, step by step.",
+        "Stay safe from scams.",
       ],
     },
-    answers: [
-      {
-        icon: "mic",
-        question: "Do I have to type?",
-        answer: "No. Just talk, and FamilyIT answers in plain words.",
-      },
-      {
-        icon: "clock",
-        question: "Will I have to keep asking my kids?",
-        answer: "No. FamilyIT is there day and night, and it never gets tired of the same question.",
-      },
-      {
-        icon: "lock",
-        question: product.safety.question,
-        answer: product.safety.seniors,
-        safety: true,
-      },
-    ],
+    howItWorks: {
+      heading: "How it works",
+      mode: "solo",
+      steps: [
+        "Ask out loud",
+        "It checks my email is real",
+        "It signs me in, with my OK",
+        "Tap Confirm. Done.",
+      ],
+    },
+    screenCopy: {
+      homeIntro: "I\u2019m FamilyIT, your tech helper. Henson set me up for you.",
+      openSiteMessage:
+        "I opened Evergreen\u2019s website for you. Henson saved your login. Want me to sign you in?",
+      signInMessage: "Signing you in with the login Henson saved.",
+      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Henson know.",
+      recapWho: "You",
+      recapAction: "Done",
+      noticeAskedTitle: "You are getting help",
+      noticeAskedBody: "You asked FamilyIT about a message from your car insurance.",
+      noticeLoginTitle: "FamilyIT signed you in.",
+      noticeLoginBody: "With your OK.",
+      noticeDoneTitle: "You confirmed your updated car insurance policy.",
+      noticeDoneBody: "All done.",
+    },
     faqs: [
       {
         question: "Can it see everything on my screen?",
         answer:
-          "It sees only what you choose to share, while you are in a session. Your family can block websites, so it cannot open banking or other pages they have ruled out.",
+          "It only sees what you choose to share during a session. Your family can also block websites, so it cannot open pages they have ruled out.",
       },
       {
         question: "Will my family see everything I do?",
         answer:
-          "Your family sees a summary of what FamilyIT helped with, and you are told what is shared. Setup starts with a conversation about it.",
+          "Your family sees a summary of what FamilyIT helped with. You are told what is shared, and setup starts with a conversation about it.",
       },
       {
         question: "How is it different from a chatbot?",
@@ -253,16 +250,14 @@ export const variants: Record<SegmentId, Variant> = {
           "A chatbot tells you what to do. FamilyIT talks with you, sees your screen, and guides you through each step as it happens.",
       },
     ],
-    form: {
-      heading: "Join the waitlist",
-      closingHeading: "Ready when you are",
-      emailLabel: "Your email",
-      heroFields: ["email"],
-      closingFields: ["email"],
-      note: "Joining is free. No card needed.",
+    closing: {
+      heading: "Be first to try FamilyIT.",
+      sub: `${product.launchWindow}.`,
+      cta: "Join the waitlist",
+      note: closingNote,
     },
     doorLine: [
-      { text: "Signing up for a parent? " },
+      { text: "Helping a parent? " },
       { text: "For my parent", href: "/families" },
       { text: ". Run a senior living community? " },
       { text: "For my community", href: "/senior-living" },
@@ -275,83 +270,77 @@ export const variants: Record<SegmentId, Variant> = {
     path: "/senior-living",
     label: "For my community",
     meta: {
-      title: "Tech help for every resident. Time back for your staff.",
+      title: "Your staff are trained for care, not Wi-Fi passwords",
       description:
-        "Residents ask FamilyIT instead of the front desk. Offer it as a resident benefit to feature on tours, and keep families informed. Request early access for your community.",
+        "FamilyIT answers residents' tech questions, so your staff can spend their time on care. Request early access for your community.",
     },
     hero: {
-      headline: "Tech help for every resident. Time back for your staff.",
-      lede: "Residents ask FamilyIT instead of the front desk. Offer it as a resident benefit.",
-      cta: "Request early access for your community",
+      headline: "Your staff are trained for care, not Wi-Fi passwords.",
+      lede: "FamilyIT answers residents' tech questions, so your staff can spend their time on care.",
+      cta: "Join the waitlist",
       priceLines: [product.communityPricingNote, product.pilotNote],
-      screens: ["home"],
-      outcomes: [
-        "Fewer tech questions at the front desk",
-        "A benefit to feature on tours",
-        "Families kept informed",
+      image: {
+        src: "/images/hero-senior-living.jpg",
+        alt: "A care worker chatting with residents over tea and cards in a sunlit community room.",
+        position: "75% 40%",
+        mobilePosition: "70% 40%",
+      },
+    },
+    why: {
+      slogan: "More time for care. Less time on tech support.",
+      points: [
+        "Staff time returns to care.",
+        "Residents protected from scams.",
+        "Helps your community stand out.",
+      ],
+    },
+    howItWorks: {
+      heading: "How it works",
+      mode: "solo",
+      steps: [
+        "A resident asks out loud",
+        "It checks the email is real",
+        "It signs them in, with their OK",
+        "They tap Confirm. Done.",
       ],
     },
     screenCopy: {
-      homeIntro: "Your community set me up for you.",
+      homeIntro: "I\u2019m FamilyIT, your tech helper. Your community set me up for you.",
+      openSiteMessage:
+        "I opened Evergreen\u2019s website for you. Your saved login is ready. Want me to sign you in?",
       signInMessage: "Signing you in with your saved login.",
+      confirmedMessage: "All done! Evergreen got your confirmation.",
       recapWho: "A resident",
       recapAction: "Call resident",
+      noticeAskedTitle: "A resident is getting help",
+      noticeAskedBody: "A resident asked FamilyIT about a message from their car insurance.",
+      noticeLoginTitle: "A resident used the login you saved.",
+      noticeLoginBody: "With their OK, they\u2019re now signed in.",
       noticeDoneTitle: "A resident confirmed their updated car insurance policy.",
       noticeDoneBody: "No action needed from you.",
-      noticeLoginTitle: "A resident used the login you saved.",
-      noticeLoginBody: "With their OK, they're now signed in.",
     },
-    storyboard: {
-      heading: "How a community uses it",
-      steps: [
-        { screen: "home", caption: "We onboard residents in one visit" },
-        { screen: "listening", caption: "Residents just talk" },
-        { screen: "signin", caption: "Staff stay out of it" },
-        { screen: "recap", caption: "You get a monthly summary" },
-      ],
-    },
-    answers: [
-      {
-        icon: "building",
-        question: "What do our staff need to do?",
-        answer:
-          "Announce it and share a resident list. FamilyIT onboards residents and answers their tech questions, so your front desk doesn't have to.",
-      },
-      {
-        icon: "card",
-        question: "How does pricing work?",
-        answer: `${product.communityPricingNote} ${product.pilotNote}`,
-      },
-      {
-        icon: "lock",
-        question: product.safety.questionCommunity,
-        answer: product.safety.seniorLiving,
-        safety: true,
-      },
-    ],
     faqs: [
       {
-        question: "Is it a medical product?",
+        question: "How does this fit alongside our existing IT provider?",
         answer:
-          "No. FamilyIT helps with technology tasks. It does not diagnose, monitor health, or track a person's location.",
+          "We don't touch your clinical or corporate systems. We cover residents' personal devices and coordinate with your IT provider where the two meet, such as resident Wi-Fi.",
       },
       {
-        question: "Which languages does it speak?",
-        answer: `${product.languagesNote}, chosen during setup for each resident.`,
+        question: "What do our staff need to do?",
+        answer:
+          "Announce the service and share a resident list. FamilyIT onboards residents and answers their tech questions, so your front desk doesn't have to.",
       },
       {
-        question: "Can it see everything on a resident's screen?",
+        question: "Who pays: the center or the family?",
         answer:
-          "It sees only what the resident chooses to share, while they are in a session. Websites can be blocked, so it cannot open pages that have been ruled out.",
+          "We're designing for both models and will discuss what suits your community during early access. Join the waitlist and tell us about your community.",
       },
     ],
-    form: {
-      heading: "Request early access",
-      closingHeading: "Bring FamilyIT to your community",
-      emailLabel: "Work email",
-      heroFields: ["email", "organization", "residents", "role"],
-      closingFields: ["email", "organization", "residents", "role", "offerModel"],
-      note: "No commitment. We'll write to you about a pilot.",
+    closing: {
+      heading: "Request early access for your community",
+      sub: "No commitment. We'll write to you about a pilot.",
+      cta: "Request early access",
+      note: closingNote,
     },
     doorLine: [
       { text: "Looking for help for yourself or a parent? " },

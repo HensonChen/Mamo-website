@@ -8,7 +8,7 @@ export function Footer() {
   const year = Number(siteConfig.lastModified.slice(0, 4));
   const founded = Number(siteConfig.foundingYear);
   const years = founded && founded < year ? `${founded} to ${year}` : String(year);
-  const link = "text-ink-soft underline decoration-2 underline-offset-4 hover:text-azure-deep";
+  const link = "text-ink-soft underline decoration-2 underline-offset-4 hover:text-plum";
 
   return (
     <footer className="border-t-2 border-line/70 bg-white">
@@ -25,7 +25,7 @@ export function Footer() {
         <nav aria-label="Footer" className="text-lg">
           <ul className="space-y-2">
             <li>
-              <a href={mailHref} className="font-bold text-azure-deep underline decoration-2 underline-offset-4 hover:text-azure">
+              <a href={mailHref} className="font-bold text-link underline decoration-2 underline-offset-4 hover:text-plum">
                 {siteConfig.contactEmail}
               </a>
             </li>

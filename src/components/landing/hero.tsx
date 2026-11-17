@@ -1,93 +1,68 @@
-import { Icon } from "@/components/icons";
-import { WrongDoor } from "@/components/landing/wrong-door";
-import { PhoneScreen } from "@/components/phone/screen";
+import Image from "next/image";
+import type { CSSProperties } from "react";
+import { WaitlistButton } from "@/components/waitlist-button";
 import { Container } from "@/components/ui";
-import { WaitlistForm } from "@/components/waitlist-form";
 import type { Variant } from "@/content/variants";
 
 /**
- * First screen of each segment page: the promise, the price, the signup
- * form, and the demo phone. On a phone the form comes before the demo so
- * the signup is on the first screen; from `lg` the demo sits beside it.
+ * First screen of each segment page: the promise, the price and the one
+ * button. From `md` the photo fills the section behind the copy, with a paper
+ * colored fade on the left so the words stay readable. On a phone the copy
+ * and the button come first and the photo is a rounded picture below them, so
+ * the button is on the first screen.
+ *
+ * The section slides up under the transparent header (negative margin and
+ * matching top padding).
  */
 export function Hero({ variant }: { variant: Variant }) {
   const { hero } = variant;
-  const single = hero.screens.length === 1;
-  // One phone can be larger; two phones share the column.
-  // With outcome tiles beside it, the phone stays smaller so the tiles have room.
-  const scale = hero.outcomes
-    ? "[--s:0.6] lg:[--s:0.62]"
-    : single
-      ? "[--s:0.6] lg:[--s:0.8]"
-      : "[--s:0.6] lg:[--s:0.55]";
-
   return (
-    <section aria-labelledby="hero-heading" className="pb-14 pt-8 sm:pb-20 sm:pt-12">
-      <Container className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="min-w-0 lg:col-span-6">
+    <section
+      aria-labelledby="hero-heading"
+      className="relative -mt-[4.5rem] overflow-hidden pt-[4.5rem] md:flex md:min-h-[34rem] md:items-center md:pb-16 md:pt-[8.5rem]"
+    >
+      <Container className="relative z-10 pb-0 pt-6 md:py-0">
+        <div className="md:max-w-[58%]">
           <h1
             id="hero-heading"
-            className="text-display font-bold text-balance text-ink lg:text-display-lg"
+            className="max-w-[18ch] text-display font-bold text-balance text-pine lg:text-display-lg"
           >
-            {variant.hero.headline}
+            {hero.headline}
           </h1>
-          <p className="mt-5 max-w-[34ch] text-xl leading-relaxed text-ink-soft sm:text-2xl">
+          <p className="mt-5 max-w-[50ch] text-xl leading-relaxed text-ink-soft sm:text-[1.375rem]">
             {hero.lede}
           </p>
-          <ul className="mt-5 space-y-1 text-lg leading-snug text-ink">
-            {hero.priceLines.map((line, index) => (
-              <li key={line} className={index === 0 ? "text-xl font-bold" : "text-ink-soft"}>
-                {line}
-              </li>
+          <div className="mt-5 space-y-1 text-xl font-bold text-pine">
+            {hero.priceLines.map((line) => (
+              <p key={line}>{line}</p>
             ))}
-          </ul>
-          <div className="mt-7 max-w-xl">
-            <WaitlistForm
-              variant={variant}
-              fields={variant.form.heroFields}
-              placement="hero"
-              heading={variant.form.heading}
-              footer={<WrongDoor parts={variant.doorLine} />}
-            />
           </div>
-        </div>
-
-        {/* min-w-0: a grid item must be allowed to shrink below the width of the swipe row inside it. */}
-        <div className="min-w-0 lg:col-span-6">
-          <div
-            className={`swipe-row flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 lg:justify-center lg:gap-6 lg:overflow-visible ${
-              single ? "justify-center" : ""
-            } ${hero.outcomes ? "flex-col items-center sm:flex-row sm:justify-center sm:overflow-visible" : ""}`}
-            tabIndex={hero.outcomes || single ? undefined : 0}
-            role={hero.outcomes || single ? undefined : "group"}
-            aria-label={hero.outcomes || single ? undefined : "What FamilyIT looks like. Swipe to see more."}
-          >
-            {hero.screens.map((screen) => (
-              <PhoneScreen
-                key={screen}
-                id={screen}
-                copy={variant.screenCopy}
-                className={`snap-center ${scale}`}
-              />
-            ))}
-            {hero.outcomes ? (
-              <ul className="flex w-full max-w-sm flex-col gap-3 sm:w-auto sm:max-w-[16rem] sm:self-center">
-                {hero.outcomes.map((outcome) => (
-                  <li
-                    key={outcome}
-                    className="flex items-start gap-3 rounded-[20px] border-2 border-line bg-white p-4 text-xl font-bold leading-snug"
-                  >
-                    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-ok text-white">
-                      <Icon name="check" className="size-5" strokeWidth={3} />
-                    </span>
-                    {outcome}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
+          <WaitlistButton variant={variant} placement="hero" className="mt-8" />
         </div>
       </Container>
+
+      <div
+        className="relative mx-5 mb-12 mt-10 aspect-[4/3] overflow-hidden rounded-3xl sm:mx-10 md:absolute md:inset-0 md:mx-0 md:my-0 md:aspect-auto md:rounded-none"
+        style={
+          {
+            "--pos-m": hero.image.mobilePosition,
+            "--pos-d": hero.image.position,
+          } as CSSProperties
+        }
+      >
+        <Image
+          src={hero.image.src}
+          alt={hero.image.alt}
+          fill
+          priority
+          sizes="(min-width: 768px) 100vw, 90vw"
+          className="object-cover [object-position:var(--pos-m)] md:[object-position:var(--pos-d)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden bg-linear-to-r from-paper from-0% via-paper/95 via-55% to-paper/0 to-80% md:block"
+        />
+      </div>
     </section>
   );
 }

@@ -20,7 +20,8 @@ const round: CSSProperties = {
   justifyContent: "center",
 };
 
-export function LockScreenNotice({ title, body }: { title: string; body: string }) {
+/** With no `title` the phone is idle: only the date and time show. */
+export function LockScreenNotice({ title, body }: { title?: string; body?: string }) {
   return (
     <div
       style={{
@@ -82,7 +83,15 @@ export function LockScreenNotice({ title, body }: { title: string; body: string 
               padding: 1.5,
             }}
           >
-            <span style={{ display: "block", width: "75%", height: "100%", background: "#FFFFFF", borderRadius: 1.5 }} />
+            <span
+              style={{
+                display: "block",
+                width: "75%",
+                height: "100%",
+                background: "#FFFFFF",
+                borderRadius: 1.5,
+              }}
+            />
           </span>
         </span>
       </div>
@@ -90,77 +99,96 @@ export function LockScreenNotice({ title, body }: { title: string; body: string 
         <svg width="16" height="20" viewBox="0 0 16 20" fill="#FFFFFF">
           <path d="M3 8V5.5a5 5 0 0 1 10 0V8h.5A1.5 1.5 0 0 1 15 9.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 17.5v-8A1.5 1.5 0 0 1 2.5 8zm2 0h6V5.5a3 3 0 0 0-6 0z" />
         </svg>
-        <span style={{ marginTop: 10, fontSize: 21, fontWeight: 600, letterSpacing: "0.01em" }}>Thursday, November 5</span>
-        <span style={{ fontSize: 96, fontWeight: 600, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 2 }}>9:47</span>
+        <span style={{ marginTop: 10, fontSize: 21, fontWeight: 600, letterSpacing: "0.01em" }}>
+          Thursday, November 5
+        </span>
+        <span
+          style={{ fontSize: 96, fontWeight: 600, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 2 }}
+        >
+          9:47
+        </span>
       </div>
-      <div style={{ padding: "30px 10px 0" }}>
-        <div style={{ position: "relative", paddingBottom: 16 }}>
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              display: "flex",
-              gap: 10,
-              alignItems: "flex-start",
-              background: "rgba(250,250,252,0.78)",
-              WebkitBackdropFilter: "blur(24px) saturate(1.6)",
-              backdropFilter: "blur(24px) saturate(1.6)",
-              borderRadius: 24,
-              padding: "13px 14px",
-            }}
-          >
-            <span
+      {title ? (
+        <div style={{ padding: "30px 10px 0" }}>
+          <div style={{ position: "relative", paddingBottom: 16 }}>
+            <div
+              className="anim"
               style={{
-                width: 38,
-                height: 38,
-                flexShrink: 0,
-                borderRadius: 9,
-                background: "linear-gradient(160deg, #4C7FE0, #2B5FC4)",
+                animation: "notif 0.45s cubic-bezier(.2,.9,.3,1.1) 0.7s both",
+                position: "relative",
+                zIndex: 3,
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
+                gap: 10,
+                alignItems: "flex-start",
+                background: "rgba(250,250,252,0.78)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+                backdropFilter: "blur(24px) saturate(1.6)",
+                borderRadius: 24,
+                padding: "13px 14px",
               }}
             >
-              <span style={{ width: 4, height: 8, borderRadius: 3, background: "#FFFFFF" }} />
-              <span style={{ width: 4, height: 8, borderRadius: 3, background: "#FFFFFF" }} />
-            </span>
-            <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1 }}>
-              <span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                <span style={{ fontSize: 16, fontWeight: 600, color: "#000" }}>FamilyIT</span>
-                <span style={{ fontSize: 14, color: "rgba(60,60,67,0.6)" }}>now</span>
+              <span
+                style={{
+                  width: 38,
+                  height: 38,
+                  flexShrink: 0,
+                  borderRadius: 9,
+                  background: "linear-gradient(160deg, #4C7FE0, #2B5FC4)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                }}
+              >
+                <span style={{ width: 4, height: 8, borderRadius: 3, background: "#FFFFFF" }} />
+                <span style={{ width: 4, height: 8, borderRadius: 3, background: "#FFFFFF" }} />
               </span>
-              <span style={{ fontSize: 16, lineHeight: 1.3, fontWeight: 600, color: "#000" }}>{title}</span>
-              <span style={{ fontSize: 16, lineHeight: 1.3, color: "#1C1C1E" }}>{body}</span>
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1 }}>
+                <span style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: "#000" }}>FamilyIT</span>
+                  <span style={{ fontSize: 14, color: "rgba(60,60,67,0.6)" }}>now</span>
+                </span>
+                <span style={{ fontSize: 16, lineHeight: 1.3, fontWeight: 600, color: "#000" }}>{title}</span>
+                <span style={{ fontSize: 16, lineHeight: 1.3, color: "#1C1C1E" }}>{body}</span>
+              </div>
             </div>
+            <div
+              style={{
+                position: "absolute",
+                left: 10,
+                right: 10,
+                bottom: 8,
+                height: 40,
+                background: "rgba(250,250,252,0.55)",
+                borderRadius: 20,
+                zIndex: 2,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 20,
+                right: 20,
+                bottom: 0,
+                height: 40,
+                background: "rgba(250,250,252,0.38)",
+                borderRadius: 18,
+                zIndex: 1,
+              }}
+            />
           </div>
-          <div
-            style={{
-              position: "absolute",
-              left: 10,
-              right: 10,
-              bottom: 8,
-              height: 40,
-              background: "rgba(250,250,252,0.55)",
-              borderRadius: 20,
-              zIndex: 2,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: 20,
-              right: 20,
-              bottom: 0,
-              height: 40,
-              background: "rgba(250,250,252,0.38)",
-              borderRadius: 18,
-              zIndex: 1,
-            }}
-          />
         </div>
-      </div>
-      <div style={{ position: "absolute", left: 46, right: 46, bottom: 44, display: "flex", justifyContent: "space-between" }}>
+      ) : null}
+      <div
+        style={{
+          position: "absolute",
+          left: 46,
+          right: 46,
+          bottom: 44,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <span style={round}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8">
             <path d="M8 3h8l-1 5H9zM9 8h6v3l-2 10h-2L9 11z" />

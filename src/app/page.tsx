@@ -16,10 +16,10 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const { screenCopy } = variants.families;
   return (
-    <section aria-labelledby="home-heading" className="py-10 sm:py-14">
-      <Container className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
+    <section aria-labelledby="home-heading" className="py-10 sm:py-14 lg:py-20">
+      <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="min-w-0 lg:col-span-6">
-          <h1 id="home-heading" className="text-display font-bold text-balance text-ink lg:text-display-lg">
+          <h1 id="home-heading" className="text-display font-bold text-balance text-pine lg:text-display-lg">
             Tech help your parent can just talk to
           </h1>
           <p className="mt-5 max-w-[34ch] text-xl leading-relaxed text-ink-soft sm:text-2xl">
@@ -30,9 +30,9 @@ export default function HomePage() {
               <li key={door.href}>
                 <Link
                   href={door.href}
-                  className="flex min-h-20 flex-col justify-center rounded-[20px] border-2 border-line bg-white px-6 py-4 transition-colors hover:border-azure hover:bg-halo"
+                  className="flex min-h-20 flex-col justify-center rounded-2xl border-2 border-line bg-white px-6 py-4 transition-colors hover:border-pine hover:bg-sage"
                 >
-                  <span className="text-xl font-bold text-azure-deep">
+                  <span className="text-xl font-bold text-pine">
                     Join the waitlist: {door.label}
                   </span>
                   <span className="text-lg text-ink-soft">{door.sub}</span>
@@ -44,8 +44,8 @@ export default function HomePage() {
         <div className="lg:col-span-6">
           {/* Two phones side by side must fit a 390px screen, so they are small there. */}
           <div className="flex justify-center gap-4 lg:gap-6">
-            <PhoneScreen id="explain" copy={screenCopy} className="[--s:0.38] sm:[--s:0.6] lg:[--s:0.55]" />
-            <PhoneScreen id="notice-done" copy={screenCopy} className="[--s:0.38] sm:[--s:0.6] lg:[--s:0.55]" />
+            <PhoneScreen id="home" copy={screenCopy} className="[--s:0.32] min-[360px]:[--s:0.38] sm:[--s:0.6] lg:[--s:0.5] xl:[--s:0.62]" />
+            <PhoneScreen id="notice-done" copy={screenCopy} className="[--s:0.32] min-[360px]:[--s:0.38] sm:[--s:0.6] lg:[--s:0.5] xl:[--s:0.62]" />
           </div>
         </div>
       </Container>

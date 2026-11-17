@@ -58,11 +58,13 @@ export function HelperFace({ size = 180 }: { size?: number }) {
 }
 
 /** The small bot that floats at the bottom right of in-app website screens. */
-export function HelperBot() {
+export function HelperBot({ animation }: { animation?: string }) {
   return (
     <span
       aria-hidden="true"
+      className={animation ? "anim" : undefined}
       style={{
+        animation,
         width: 56,
         height: 56,
         borderRadius: 28,

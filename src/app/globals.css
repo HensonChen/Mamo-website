@@ -1,19 +1,23 @@
 @import "tailwindcss";
 
 /*
- * Design tokens, taken from the WireframeDemoStyled2 mockup.
+ * Design tokens, taken from the updated landing mockup.
  * One typeface (Atkinson Hyperlegible, designed for low-vision readers),
- * a calm blue page, white surfaces, one blue for every primary action.
+ * a warm paper page, pine and sage sections, and one plum for every action.
+ * The phone screens keep the app's own blue; they are drawn with fixed colors.
  */
 @theme {
-  --color-sky: #eef4fc;
-  --color-halo: #dce9fa;
-  --color-azure: #2b5fc4;
-  --color-azure-deep: #1f4fa8;
-  --color-ink: #1b2533;
-  --color-ink-soft: #4b5768;
-  --color-line: #c3d7f2;
-  --color-chip: #f1f3f6;
+  --color-paper: #fbfaf7;
+  --color-sage: #e6ede6;
+  --color-pine: #244b43;
+  --color-pine-2: #2e5a50;
+  --color-plum: #7c3c5c;
+  --color-plum-deep: #66304b;
+  --color-link: #3e6b5e;
+  --color-ink: #1e2a28;
+  --color-ink-soft: #4c5a57;
+  --color-line: #c9d6cb;
+  --color-chip: #eef1ec;
   --color-edge: #7a8799;
   --color-ok: #1e6b47;
   --color-ok-bg: #e9f5ee;
@@ -22,12 +26,18 @@
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: 2.5rem;
-  --text-display--line-height: 1.1;
-  --text-display--letter-spacing: -0.02em;
-  --text-display-lg: 3.75rem;
+  --text-display: 2.75rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.025em;
+  --text-display-lg: 4.25rem;
   --text-display-lg--line-height: 1.05;
   --text-display-lg--letter-spacing: -0.025em;
+  --text-h2: 2.5rem;
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2-lg: 2.75rem;
+  --text-h2-lg--line-height: 1.1;
+  --text-h2-lg--letter-spacing: -0.02em;
 }
 
 html {
@@ -45,13 +55,14 @@ html {
     transition-duration: 0.01ms !important;
   }
   .helper-look,
-  .helper-blink {
+  .helper-blink,
+  .anim {
     animation: none !important;
   }
 }
 
 body {
-  background-color: var(--color-sky);
+  background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 1.125rem;
@@ -62,7 +73,7 @@ body {
 
 /* Keyboard focus: thick, high-contrast, consistent. */
 :focus-visible {
-  outline: 3px solid var(--color-azure-deep);
+  outline: 3px solid var(--color-plum);
   outline-offset: 3px;
   border-radius: 0.5rem;
 }
@@ -132,4 +143,70 @@ details[open] .details-chevron {
 }
 .swipe-row::-webkit-scrollbar {
   display: none;
+}
+
+/* Phone screen animations, ported from the mockup's screens. */
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes sheetup {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes popin {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes botin {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes talk {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+@keyframes notif {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
