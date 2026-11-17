@@ -7,8 +7,8 @@ import { useEffect, useRef } from "react";
 /**
  * Meta Pixel, loaded only when NEXT_PUBLIC_META_PIXEL_ID is set. The first
  * PageView comes from the snippet; later PageViews fire when the visitor
- * moves between pages without a full reload. Signup events are fired by
- * the waitlist form, using the event id the server returns.
+ * moves between pages without a full reload. The Lead event is not fired
+ * here: it comes from the thank-you page, after a real Tally submission.
  */
 export function MetaPixel() {
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;

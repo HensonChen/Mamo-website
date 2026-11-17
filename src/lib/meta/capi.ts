@@ -4,40 +4,48 @@ import { join } from "node:path";
 import { absoluteUrl } from "@/config/site";
 
 /**
- * Meta Conversions API, called from the server so a signup still reaches
- * Meta when the browser Pixel is blocked (iPhone privacy settings, ad
- * blockers). It reports the same `event_id` as the browser Pixel, so Meta
- * counts each signup once.
+ * Meta Conversions API, called from the Tally webhook so a signup still
+ * reaches Meta when the browser Pixel is blocked (iPhone privacy settings, ad
+ * blockers, or a visitor who closed the tab before the thank-you page loaded).
+ * It reports the same event name and `event_id` (Tally's submission id) as the
+ * thank-you page's Pixel Lead, so Meta counts each signup once.
  *
  * Needs `NEXT_PUBLIC_META_PIXEL_ID` and `META_CAPI_ACCESS_TOKEN` (a server-only
  * secret). With either one missing, nothing is sent and the site works as usual.
  * `META_TEST_EVENT_CODE` is set only while checking events in Events Manager.
+ * `META_CAPI_DRY_RUN=1` writes each payload to `data/capi-dry-run.ndjson`
+ * instead of sending it, for checking the payload without Meta.
  */
 
 // Check this against Meta's current docs before launch; set META_GRAPH_VERSION to override.
 const DEFAULT_GRAPH_VERSION = "v21.0";
 const TIMEOUT_MS = 2000;
 
-export type CapiEventName = "Lead" | "CrossSegmentSignup";
+export type CapiEventName = "Lead";
 
 export type CapiEvent = {
   eventName: CapiEventName;
   eventId: string;
   /** Seconds since the epoch. */
   eventTime: number;
-  /** Page the signup came from, e.g. "/families". */
+  /** Page the signup is for, e.g. "/families". */
   sourcePath: string;
   email: string;
-  /** Random entry id, hashed and sent as `external_id`. */
+  /** Random click id (or the submission id), hashed and sent as `external_id`. */
   externalId: string;
   segment: string;
   fbc?: string;
   fbp?: string;
+  /** Left out when the request comes from Tally's server rather than the visitor. */
   ip?: string;
   userAgent?: string;
 };
 
-export type CapiResult = { status: "sent" } | { status: "skipped" } | { status: "failed"; reason: string };
+export type CapiResult =
+  | { status: "sent" }
+  | { status: "dry-run" }
+  | { status: "skipped" }
+  | { status: "failed"; reason: string };
 
 export function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
@@ -88,9 +96,20 @@ async function recordFailure(payload: unknown, reason: string): Promise<void> {
 export async function sendCapiEvent(event: CapiEvent): Promise<CapiResult> {
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const token = process.env.META_CAPI_ACCESS_TOKEN;
-  if (!pixelId || !token) return { status: "skipped" };
-
   const payload = buildCapiPayload(event, process.env.META_TEST_EVENT_CODE || undefined);
+
+  if (process.env.META_CAPI_DRY_RUN === "1") {
+    try {
+      const dir = join(process.cwd(), "data");
+      await mkdir(dir, { recursive: true });
+      await appendFile(join(dir, "capi-dry-run.ndjson"), JSON.stringify(payload) + "\n", "utf8");
+    } catch (error) {
+      console.error("[meta-capi] dry run could not be written", error);
+    }
+    return { status: "dry-run" };
+  }
+
+  if (!pixelId || !token) return { status: "skipped" };
   const version = process.env.META_GRAPH_VERSION || DEFAULT_GRAPH_VERSION;
   // Meta documents the token as a query parameter. It is never logged here.
   const url = `https://graph.facebook.com/${version}/${encodeURIComponent(pixelId)}/events?access_token=${encodeURIComponent(token)}`;

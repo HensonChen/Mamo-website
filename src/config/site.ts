@@ -49,7 +49,7 @@ export const siteConfig = {
 
     /** Community pricing: no number on purpose. Shown on /senior-living only. */
     communityPricingNote:
-      "Priced per resident, with community rates. We'll quote for your community.", // PLACEHOLDER
+      "Priced per resident, with community rates.", // PLACEHOLDER
     /** Length of the pilot is decided later, so no number is promised here. */
     pilotNote: "Founding communities get a free pilot.", // PLACEHOLDER
 
@@ -75,14 +75,35 @@ export const siteConfig = {
   },
 
   /**
-   * Waitlist storage. Default appends to a local NDJSON file (gitignored).
-   * See `src/lib/waitlist/README.md` for wiring a real provider.
+   * The waitlist lives in Tally (tally.so), one form per segment. This repo
+   * holds only the button, the thank-you page and the webhook receiver. Tally
+   * holds the questions, the hidden fields, the redirect after submit, the
+   * webhook URL and the signing secret (TALLY_SIGNING_SECRET, server only).
    */
   waitlist: {
-    /** Shown under the form. */
+    tally: {
+      /** One form per segment. The form id in the URL (`/r/<id>`) tells the webhook which segment it is. */
+      forms: {
+        families: { url: "https://tally.so/r/PLACEHOLDER_FAMILIES" }, // PLACEHOLDER
+        seniors: { url: "https://tally.so/r/PLACEHOLDER_SENIORS" }, // PLACEHOLDER
+        "senior-living": { url: "https://tally.so/r/PLACEHOLDER_COMMUNITY" }, // PLACEHOLDER
+      },
+      /** Hidden-field names. They must match the names created in each Tally form. */
+      hiddenFields: {
+        segment: "segment", // PLACEHOLDER
+        fbc: "fbc", // PLACEHOLDER
+        fbp: "fbp", // PLACEHOLDER
+        clickId: "click_id", // PLACEHOLDER
+      },
+    },
+    /** Where Tally sends people after a real submit. Set as the form's redirect: /thanks?sid=@SubmissionID&seg=@segment */
+    thanksPath: "/thanks",
+    /** Shown near the button, so nobody is surprised to leave the site. */
+    buttonNote: "Opens a short sign-up form on tally.so",
+    /** Shown under the form buttons. */
     privacyNote:
       "We only use your email to tell you about FamilyIT. No spam, and you can leave the list with one click.",
-    /** Confirmation copy. */
+    /** Confirmation copy on the thank-you page. */
     successTitle: "You're on the list.",
     successBody: "We'll email you when early access opens.",
   },
@@ -91,7 +112,7 @@ export const siteConfig = {
   tracking: {
     /** Signups from these addresses are stored but never counted or sent to Meta. */
     testEmails: ["test@familyit.example.com"] as string[], // PLACEHOLDER: add team addresses
-    /** A signup counts for a paid ad only within this many days of the click. */
+    /** A signup counts for a paid ad only within this many days of the ad click. */
     attributionWindowDays: 7,
   },
 
