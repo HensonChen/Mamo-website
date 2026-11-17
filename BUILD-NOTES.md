@@ -1,4 +1,109 @@
-# Build notes: three segment landing pages
+# Build notes
+
+# v1: new design, Tally sign-up (branch `landing-build-v1`)
+
+Built on the local branch `landing-build-v1`, from `landing-build`. **Nothing
+was pushed.** The sections below this one (from "Build notes: three segment
+landing pages" on) describe the earlier `landing-build` branch; where they
+mention the on-site form, the server action, `data/waitlist.ndjson` or
+`e2e-rules.mjs`, they no longer apply here.
+
+## What changed
+
+- **Design** from `updated-landing-mockup`: pine/sage/plum palette, photo hero,
+  three "why" points, "How it works" with an auto-playing phone demo, FAQ,
+  closing band. One template (`VariantPage`) and one content file
+  (`src/content/variants.ts`) are kept. Responsive: the mockup is desktop only;
+  the layout stacks on phones (copy and button first, then the photo), the
+  steps become a row of numbers under 1024px, and the two phones of the family
+  demo shrink to fit 360px. No horizontal scroll from 320 to 1440px on any page.
+- **Senior living steps** rewritten: "A resident asks out loud / It checks the
+  email is real / It signs them in, with their OK / They tap Confirm. Done."
+- **Sign-up** is a button to a Tally form, same tab. The on-site form, server
+  action, validation, bot log and the two old e2e scripts were removed.
+- **Tracking:** no event on click. `Lead` is sent when a form is really
+  submitted: by the Pixel on `/thanks?sid=<submission id>` and by the signed
+  webhook through the Conversions API, both with the submission id as event id.
+  See the README, "How a signup works".
+
+## Set up Tally (you do this; it was not done here)
+
+For each of the three forms (families, seniors, community):
+
+1. Add **hidden fields** named exactly as in `siteConfig.waitlist.tally.hiddenFields`:
+   `segment`, `fbc`, `fbp`, `click_id`.
+2. Add an **email** question (the webhook reads the first email-type field) and
+   any other questions (name, community, who it is for). Questions live in
+   Tally, not in this repo.
+3. **Redirect on completion** to
+   `https://<domain>/thanks?sid=@SubmissionID&seg=<segment>` (use the segment
+   of that form). **Check that Tally accepts the submission-id mention in the
+   redirect URL**; I could not open Tally from here. If Tally offers a different
+   name for it, use that. If it cannot, `/thanks` simply fires no Pixel `Lead`
+   and the webhook alone reports it (Meta still counts the signup).
+4. **Webhook:** URL `https://<domain>/api/tally/webhook`, set a **signing
+   secret**, and put the same value in `TALLY_SIGNING_SECRET`. Use Tally's
+   "send test event" and confirm a 200.
+5. Turn on **reCAPTCHA** (or Tally's spam protection) on the form. With no
+   on-site form, that is the only bot protection.
+6. Paste each form's URL into `src/config/site.ts` (the form id in the URL is
+   how the webhook knows the segment).
+
+The webhook checks the signature as base64 HMAC-SHA256 of the raw body in the
+`tally-signature` header, which is what Tally documents. Confirm it with
+Tally's test event; if it fails, `verifyTallySignature` in
+`src/lib/tally-webhook.ts` is the one place to change.
+
+## Decisions
+
+- The webhook finds the segment from the form id, not the hidden field, because
+  a visitor can edit URL parameters. The hidden `segment` is logged only for
+  comparison.
+- `click_id` (random UUID per button click) is hashed and sent as `external_id`
+  so a signup can be matched without an email on the page.
+- The webhook sends no IP address or user agent: the request is from Tally.
+- Test addresses (`siteConfig.tracking.testEmails`, `+test`) are logged and
+  never sent to Meta. Signups without an ad click in the last 7 days are
+  logged, sent to Meta as `Lead`, and not counted in the cost per signup.
+- `/thanks` shows the Pixel `Lead` only when `sid` looks like a real id
+  (letters, digits, `-`, `_`, up to 64), and remembers it in `sessionStorage`.
+- Phone screens keep the app's own blues; the page around them uses the new
+  palette.
+- The report can no longer tie a signup to one ad (the webhook has no ad id),
+  so it counts signups per segment and lists ads with their spend only.
+- The hero photos are copied from the mockup assets into `public/images`.
+- The "How it works" demo is paused for visitors who prefer reduced motion, and
+  has a pause button for everyone (WCAG 2.2.2).
+
+## Verification
+
+| Check | Status |
+| --- | --- |
+| `npm run lint`, `npx tsc --noEmit` | Passed |
+| `npm run build` with Meta and Tally variables unset | Passed (fixed: route config is not allowed with Cache Components; `/thanks` reads `searchParams` inside `Suspense`) |
+| `node scripts/e2e-tally.mjs` (signed webhook, dedupe, test address, unknown form, bad or missing signature, secret unset, `/thanks`, no form on pages) | Passed, 38 checks |
+| Browser (Cursor): hero button gives Tally URL with `segment`, `fbc` (built from `fit_attr`), `fbp`, `click_id`, and sends no Pixel event | Passed, with a stand-in `fbq` and made-up cookies |
+| Browser: `/thanks?sid=abc123` fires one `Lead` with `eventID` `abc123`; a reload fires none | Passed, with a stand-in `fbq` |
+| Horizontal overflow at 320, 360, 390, 430, 600, 768, 900, 1024, 1280, 1440 on `/`, three segment pages, `/thanks`, `/privacy`, `/terms` | None (found and fixed overflow at 320 and 1024 on `/` and 320 on `/families`) |
+| Contrast | Lowest text pair is faded step text on the pine hover (5.0); everything else 5.1 to 14.2 against the 4.5 minimum |
+| Screenshots | Looked at in the Cursor browser at 390 and desktop width. No files saved |
+| Real Tally forms, real submission, Tally signature on a real test event | **Not run** (forms do not exist yet) |
+| Meta Events Manager: one `Lead` per submission from browser and server | **Not run** (needs your Pixel, token and a real submit) |
+| Real phone, real ad click | **Not run** |
+| `fb-report.mjs` against a real export | Syntax checked only; **not run** on data |
+
+## Next
+
+1. Create the three Tally forms and do the setup above.
+2. Replace the placeholders in `src/config/site.ts`.
+3. Set `TALLY_SIGNING_SECRET` and the Meta variables; run a test submission with
+   `META_TEST_EVENT_CODE` and confirm one `Lead` with one event id.
+4. Use a store that persists (`src/lib/signups/`) if the host has no writable disk.
+5. Review the privacy text with whoever owns legal.
+
+---
+
+# Earlier build: three segment landing pages (`landing-build`)
 
 Built overnight on the local branch `landing-build` (from `main`). **Nothing was
 pushed.** `main` and `origin/main` are both still `8bc31e2`, `origin` is

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Resend Conversions API events that failed when the signup happened.
+// Resend Conversions API events that failed when the signup arrived.
 //
-// The waitlist action logs each failed event to data/capi-failures.ndjson. Meta
+// The Tally webhook logs each failed event to data/capi-failures.ndjson. Meta
 // accepts events up to 7 days old, so run this before then. Events that
 // succeed are removed from the file; events older than the limit are dropped
 // and counted; events that fail again stay for the next run.
