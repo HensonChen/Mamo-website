@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MetaPixel } from "@/components/meta-pixel";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // One typeface for everything. Designed by the Braille Institute for
@@ -99,6 +100,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <JsonLd data={siteGraph()} />
         <MetaPixel />
+        <Analytics />
       </body>
     </html>
   );
