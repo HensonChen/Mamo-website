@@ -1,5 +1,5 @@
 import { absoluteUrl, siteConfig } from "@/config/site";
-import type { Solution } from "@/content/solutions";
+import type { Variant } from "@/content/variants";
 
 const orgId = absoluteUrl("/#organization");
 const websiteId = absoluteUrl("/#website");
@@ -44,9 +44,8 @@ export function siteGraph() {
   };
 }
 
-export function faqPage(faqs: Faq[], pageUrl: string) {
+function faqNode(faqs: Faq[], pageUrl: string) {
   return {
-    "@context": "https://schema.org",
     "@type": "FAQPage",
     "@id": `${pageUrl}#faq`,
     mainEntity: faqs.map((faq) => ({
@@ -57,9 +56,9 @@ export function faqPage(faqs: Faq[], pageUrl: string) {
   };
 }
 
-/** WebPage + Service for a solution page. FAQPage is emitted separately. */
-export function solutionGraph(solution: Solution) {
-  const pageUrl = absoluteUrl(`/solutions/${solution.slug}`);
+/** WebPage + Service + FAQPage for one segment page. */
+export function variantStructuredData(variant: Variant) {
+  const pageUrl = absoluteUrl(variant.path);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -67,8 +66,8 @@ export function solutionGraph(solution: Solution) {
         "@type": "WebPage",
         "@id": pageUrl,
         url: pageUrl,
-        name: solution.title,
-        description: solution.description,
+        name: variant.meta.title,
+        description: variant.meta.description,
         isPartOf: { "@id": websiteId },
         about: { "@id": `${pageUrl}#service` },
         inLanguage: "en-US",
@@ -76,17 +75,14 @@ export function solutionGraph(solution: Solution) {
       {
         "@type": "Service",
         "@id": `${pageUrl}#service`,
-        name: `${siteConfig.name}: ${solution.title}`,
-        description: solution.description,
-        serviceType: "Technology care and support",
+        name: `${siteConfig.name}: ${variant.label}`,
+        description: variant.meta.description,
+        serviceType: "Voice and screen technology help for older adults",
         provider: { "@id": orgId },
         areaServed: siteConfig.product.initialRegions,
-        audience: {
-          "@type": "Audience",
-          audienceType: solution.navLabel.replace(/^For /, ""),
-        },
         url: pageUrl,
       },
+      faqNode(variant.faqs, pageUrl),
     ],
   };
 }

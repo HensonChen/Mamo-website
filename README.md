@@ -1,9 +1,21 @@
 # FamilyIT waitlist site
 
-Pre-launch marketing site and waitlist for FamilyIT, a technology care service
-for older relatives, people with disabilities, children and care centers.
-Next.js (App Router), TypeScript, Tailwind CSS. Static pages plus one server
-action for the waitlist. No CMS, auth or database.
+Pre-launch site for FamilyIT, a voice-and-screen AI tech helper for older
+adults. It has three landing pages, one per go-to-market segment, built to test
+which segment signs up at the lowest cost on Facebook:
+
+| Route | Segment | Who it is for |
+| --- | --- | --- |
+| `/families` | Adult children | "Be their family, not their help desk." |
+| `/seniors` | Older adults | "Tech help whenever you need it. Just talk." |
+| `/senior-living` | Senior living operators | "Your staff are trained for care, not Wi-Fi passwords." |
+| `/` | none | A one-screen chooser with three doors. Never an ad destination. |
+| `/thanks` | none | Where Tally sends people after a real submit. Not indexed. |
+
+Next.js (App Router), TypeScript, Tailwind CSS. Static pages plus one webhook
+route. No CMS, auth or database. **There is no sign-up form on this site.**
+Each segment page has a button that opens a Tally form (tally.so, free plan)
+in the same tab. Tally collects the email and answers.
 
 ## Run it
 
@@ -19,127 +31,209 @@ npm run build
 npm start
 ```
 
-Waitlist signups are appended to `data/waitlist.ndjson` (gitignored) by
-default. See `src/lib/waitlist/README.md` to plug in a real provider.
+No environment variables are needed to look at the site locally. `.env*` files
+are gitignored; put keys in `.env.local`.
 
-No environment variables are needed to run locally. `.env*` files are
-gitignored; put provider keys in `.env.local`.
+| Variable | Used for |
+| --- | --- |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Loads the Meta Pixel. Unset: no Pixel. |
+| `META_CAPI_ACCESS_TOKEN` | Server-only. Conversions API token. Unset: no server events. |
+| `META_TEST_EVENT_CODE` | Only while checking Events Manager's Test Events tab. |
+| `META_GRAPH_VERSION` | Optional. Defaults to the version in `src/lib/meta/capi.ts`. |
+| `META_CAPI_DRY_RUN=1` | Writes each Conversions API payload to `data/capi-dry-run.ndjson` instead of sending it. For tests. |
+| `TALLY_SIGNING_SECRET` | Server-only. The signing secret from the Tally webhook. Unset: the webhook answers 503 and does nothing. |
+| `SIGNUP_STORE` | Where the webhook logs signups: `file` (default, `data/signups.ndjson`) or `redis` (Upstash, for Vercel). |
+| `SIGNUPS_FILE_NAME` | File name inside `data/` for the file store. |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | With `SIGNUP_STORE=redis`: the Upstash REST URL and the read-write token. The Vercel Upstash connection provides both. The read-only token, `KV_URL` and `REDIS_URL` are not used. |
 
 ## Editing the site
 
-Most edits are text changes in three places; components rarely need touching.
-
 | To change… | Edit |
 | --- | --- |
-| Facts: domain, contact email, launch window, regions, pricing note | `src/config/site.ts` |
-| Home page copy (hero, problem, solution, benefits, how it works, FAQ, "who it's for" cards) | `src/content/landing.ts` |
-| Solution page copy (hero, problem, solution, benefits, FAQs, waitlist heading, page title and meta description) | `src/content/solutions.ts` |
-| Waitlist "who is this for" options | `src/content/audiences.ts` |
+| Facts: domain, contact email, launch window, prices, test addresses, Tally form URLs and hidden-field names, thank-you text | `src/config/site.ts` |
+| Everything a segment page says (hero, why points, steps, phone captions, FAQ, closing) | `src/content/variants.ts` |
+| The segment ids | `src/content/audiences.ts` |
+| The phone pictures | `src/components/phone/` |
+| Page layout and styling | `src/components/landing/`, `src/app/globals.css` |
 | Privacy and terms text | `src/app/privacy/page.tsx`, `src/app/terms/page.tsx` |
-| Section layout and styling | `src/components/sections/*.tsx`, `src/components/solution-page.tsx`, `src/app/globals.css` |
+| Questions asked at sign-up (name, community, anything else) | In Tally, not in this repo |
 
-Each route is a folder under `src/app/` (App Router): `/` is
-`src/app/page.tsx`, `/solutions/seniors` is
-`src/app/solutions/seniors/page.tsx`, and so on. The four solution pages are
-thin wrappers that render the shared `SolutionPage` template with their slug.
-Header, footer and sitemap read from `src/content/solutions.ts`, so
-navigation updates itself.
+The three pages share one template (`VariantPage`) so that results differ
+because of words and pictures, not layout. Price, trial and safety wording are
+written once in `siteConfig.product` and referenced from the content file.
 
-### Adding a solution page
+Old `/solutions/*` URLs redirect (see `next.config.ts`): seniors to
+`/seniors`, care centers to `/senior-living`, the two removed audiences to `/`.
 
-1. Add the id to `audienceIds` in `src/content/audiences.ts`, and a matching
-   entry to `waitlistAudienceOptions` so the form can pre-select it.
-2. Add a `Solution` object to `solutions` in `src/content/solutions.ts`
-   (TypeScript will tell you which fields are missing).
-3. Add a card to `audienceOverview` in `src/content/landing.ts` if it should
-   appear in the home page's "who it's for" section.
-4. Copy `src/app/solutions/seniors/` to `src/app/solutions/<slug>/` and change
-   the slug in both `page.tsx` and `opengraph-image.tsx`.
-5. `npm run build` and check the new route appears in the output.
+## How a signup works
 
-### Making changes
+```
+ad  ->  /families (cookie fit_attr written from the ad URL)
+    ->  "Join the waitlist" button (a plain link to the Tally form)
+          on click, adds ?segment=families&fbc=...&fbp=...&click_id=...
+    ->  Tally form (same tab)
+    ->  submit
+          Tally -> POST /api/tally/webhook   (signed; hashed email -> Meta CAPI "Lead")
+          Tally -> redirect /thanks?sid=<submission id>&seg=<segment>
+                   (page fires Pixel "Lead" with eventID = sid)
+```
 
-Branch off `main`, run `npm run lint && npm run build` before pushing, and
-open a pull request. Both must pass; the build also type-checks.
+- **Nothing counts on click.** No Meta event is sent when the button is
+  pressed. A signup is a submitted Tally form, nothing else.
+- **No JavaScript:** the link still works and carries `segment`. The Meta
+  values need JavaScript.
+- **Hidden fields** `segment`, `fbc`, `fbp`, `click_id`: the names are in
+  `siteConfig.waitlist.tally.hiddenFields`. `fbc` is the `_fbc` cookie, or
+  built from the `fbclid` in `fit_attr`. `click_id` is a random UUID made per
+  click.
+- **Dedupe:** the thank-you page and the webhook both send a `Lead`, both with
+  Tally's submission id as the event id. Meta counts it once. The page
+  remembers the id in `sessionStorage`, so a reload sends nothing.
+- **The webhook is the source of truth.** It checks Tally's signature
+  (HMAC-SHA256 of the raw body, base64, header `tally-signature`) and finds the
+  segment from the form id, not from the hidden field. It ignores repeated
+  submission ids, hashes the email, and logs a line without the email to
+  `data/signups.ndjson`. The email stays in Tally.
+- **Counted for the report:** the ad click inside 7 days (read from `fbc`) and
+  not a test address (team addresses in `siteConfig.tracking.testEmails`, or any
+  address with `+test`). Test submissions are logged and never sent to Meta.
+- The server sends no IP address or user agent: the webhook request comes from
+  Tally's server, not the visitor.
 
-## Pages
+`AttributionCapture` writes `fit_attr` only on the three segment pages and only
+when the URL has `fit_seg` plus `utm_medium=paid_social` or `fbclid`. The
+cookie lasts 30 days, the last paid click wins, and visiting `/` never changes
+it.
 
-| Route | What it is |
-| --- | --- |
-| `/` | Problem, solution, benefits, who it's for, how it works, FAQ, waitlist |
-| `/solutions/seniors` | Older relatives |
-| `/solutions/disabilities` | People with disabilities |
-| `/solutions/children` | Children and parents |
-| `/solutions/care-centers` | Care centers (B2B) |
-| `/privacy`, `/terms` | Minimal legal pages, marked as placeholders |
-| `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | Generated |
-| `/opengraph-image`, `/solutions/*/opengraph-image` | Generated social images |
+`data/signups.ndjson` is the local default. On Vercel the filesystem does not
+persist, so set `SIGNUP_STORE=redis`: each record is stored as JSON under
+`signup:<submissionId>` in Upstash Redis, and the ids are in the set
+`signups:ids`. No email is stored. To read them for the report, load the same
+variables (`vercel env pull .env.local`, then `set -a; source .env.local; set +a`)
+and run `SIGNUP_STORE=redis node scripts/fb-report.mjs --ads ads.csv`.
 
-Each solution page has its own metadata, canonical, Open Graph image and
-JSON-LD (WebPage + Service, FAQPage). The waitlist form on each pre-selects
-the matching "who is this for" option.
+## Facebook test: setup checklist
+
+Paid ads send to the three segment pages only, never to `/`. Decision metric:
+cost per real waitlist signup.
+
+1. **Tally** (one form per segment; see `BUILD-NOTES.md` for the full list):
+   hidden fields, redirect, webhook, signing secret.
+2. **Fill the placeholders** in `src/config/site.ts`: the three Tally form URLs
+   and the hidden-field names.
+3. **Environment variables** from the table above.
+4. **Team addresses** in `siteConfig.tracking.testEmails`.
+5. **Privacy and terms**: replace the placeholder notice. The privacy page
+   already says Tally collects the waitlist and that the email and ad-click id
+   go to Meta on submit.
+6. **Ad URLs.** Each ad's URL parameters:
+
+   ```
+   utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.id}}&utm_term={{adset.id}}&utm_content={{ad.id}}&fit_seg=<segment>&fit_place={{placement}}
+   ```
+
+   `<segment>` is `families`, `seniors` or `senior-living`, and the ad must
+   open that segment's page.
+7. **Name every ad with its segment first**, for example `families_concept1_a`,
+   `seniors_concept1_a`, `senior-living_concept1_a`. The report reads the
+   segment from the name.
+8. **Ads Manager**: 7-day click attribution, 1-day view off. Columns: Ad ID,
+   Ad name, Amount spent, Impressions, Link clicks, Landing page views, Website
+   leads. Export a CSV by ad id.
+9. **Domain verification** in Business Manager. If Events Manager still shows
+   Aggregated Event Measurement settings, put `Lead` first.
+10. **Smoke test before spending**: with `META_TEST_EVENT_CODE` set, submit one
+    form per page. Confirm each `Lead` appears in Test Events once, with one
+    event id, from both the browser and the server.
+
+### Reading the result
+
+```bash
+node scripts/fb-report.mjs --ads ads-export.csv \
+  --since 2026-12-01 --until 2026-12-14
+```
+
+Add `--json` for machine-readable output. The report reads
+`data/signups.ndjson` (or Redis, with `SIGNUP_STORE=redis`) and shows, per segment: spend, real signups (one per
+Tally submission id), cost per signup with a 95% interval, Meta's leads and the
+gap from ours (above about 20% means check tracking), and signups per landing
+page view. A signup can no longer be tied to one ad, so ads are listed with
+their spend and Meta leads and compared through their segment.
+
+Decision rule (fixed before launch): the segment with the lowest cost per
+signup wins if the runner-up costs at least 1.5 times more, or the 95% interval
+on the cost ratio excludes 1. Otherwise it is a tie, broken by signup quality
+(Tally's own export has the answers) and then strategy. Do not stop early. A
+weak `/senior-living` result can be a channel result, since Facebook's reach
+among operators is thin.
+
+If a Conversions API call failed, the event is kept in
+`data/capi-failures.ndjson`. Resend while Meta still accepts it (7 days):
+
+```bash
+set -a; source .env.local; set +a
+node scripts/capi-backfill.mjs --dry-run   # look first
+node scripts/capi-backfill.mjs
+```
 
 ## Before launch: placeholders
 
 Everything factual lives in **`src/config/site.ts`**; search for `PLACEHOLDER`:
+the domain, legal name, contact email, socials, launch window, regions, prices
+and trial wording, community pricing and pilot notes, Tally URLs and field
+names, and test addresses.
 
-| Key | What it is |
-| --- | --- |
-| `url` | Production domain (canonical, sitemap, robots, OG, JSON-LD) |
-| `legalName`, `foundingYear` | Footer and legal pages |
-| `contactEmail` | Footer and privacy/terms |
-| `socials`, `twitterHandle` | JSON-LD `sameAs`, Twitter cards |
-| `product.launchWindow` | "Early access opens in…" shown by the form and in the FAQ |
-| `product.initialRegions` | Launch regions, used in FAQ and Service JSON-LD |
-| `product.pricingNote` | Pricing sentence shown by the form and in the FAQ |
-| `product.deliveryNote`, `product.devicesNote` | How the service is delivered and what it covers |
+Also: the privacy and terms pages show a visible "Placeholder" notice from
+`src/components/legal-page.tsx`. Remove it once the text is reviewed.
 
-Also:
-
-- Privacy and terms pages show a visible "Placeholder" notice from
-  `src/components/legal-page.tsx`. Remove it once the text is reviewed.
-- Wire a real waitlist provider (`src/lib/waitlist/index.ts`) before deploying
-  to a serverless host; the file provider is for local development.
-
-Outcome-level copy (no product claims) lives in `src/content/landing.ts`,
-`src/content/solutions.ts` and `src/content/audiences.ts`.
-
-## Design
+## Design (v1)
 
 - Typeface: Atkinson Hyperlegible, designed by the Braille Institute for
-  low-vision readers. One family, two weights. Body text is 18px.
-- Palette: paper `#fbfaf7`, sage `#e6ede6`, pine `#244b43`, moss `#3e6b5e`,
-  berry `#7c3c5c` (the single accent, used for the primary action).
-- Mark: three paper-cut circles leaning together (`Mark` in
-  `src/components/icons.tsx`, also `src/app/icon.svg`).
-- No cards, gradients or decorative icons. Hairline rules separate list items;
-  numbers appear only in the genuinely sequential "How it works".
+  low-vision readers. Body text is 18px, buttons are 64px tall, focus rings are
+  thick.
+- Palette: paper `#fbfaf7`, sage `#e6ede6`, pine `#244b43` (headings and dark
+  bands), plum `#7c3c5c` (every primary action), ink `#1e2a28`, ink-soft
+  `#4c5a57`. Tokens are in `src/app/globals.css`.
+- Sections of a segment page: photo hero with the sign-up button, "why" points,
+  "How it works" with a phone demo, FAQ, closing band.
+- "How it works" plays by itself once it scrolls into view and loops. It has a
+  pause button and step buttons. For visitors who prefer reduced motion it does
+  not start by itself.
+- The phone screens in `src/components/phone/` are drawn at 390 x 844 and
+  scaled with the CSS variable `--s`; they keep the app's own blues. They
+  shrink to fit a 360px screen (two phones side by side on family pages).
 
 ## Scripts
 
+- `scripts/e2e-tally.mjs`: after `npm run build`, starts the site with
+  `TALLY_SIGNING_SECRET=test` and `META_CAPI_DRY_RUN=1`, then checks the pages
+  have no form and a Tally button, and sends signed sample submissions to the
+  webhook (counted, repeat, bad signature, secret unset, test address, unknown
+  form) and `/thanks`. Nothing leaves the machine.
+- `scripts/fb-report.mjs`, `scripts/capi-backfill.mjs`: see above.
 - `scripts/screenshot.mjs <url> <width> <height> <out.png> [y]` captures a page
   through headless Chrome's DevTools protocol (start Chrome with
   `--headless=new --remote-debugging-port=9333` first).
-- `scripts/e2e-waitlist.mjs <url> <email> [out.png]` fills and submits the
-  waitlist form and exits non-zero unless the success state renders.
 
 ## Structure
 
 ```
 src/app/
-  layout.tsx                 font, global metadata, header/footer, Organization + WebSite JSON-LD
-  page.tsx                   home
-  solutions/<slug>/          page.tsx + opengraph-image.tsx per audience
-  actions/waitlist.ts        server action: honeypot, validation, storage
+  layout.tsx                 font, metadata, header/footer, MetaPixel, JSON-LD
+  page.tsx                   "/" three-door chooser
+  families/, seniors/, senior-living/   page.tsx + opengraph-image.tsx each
+  thanks/                    where Tally redirects; fires the Pixel Lead
+  api/tally/webhook/route.ts signed webhook: dedupe, hash, Conversions API, log
   privacy/, terms/           legal pages
-  sitemap.ts, robots.ts, manifest.ts, opengraph-image.tsx, icon.svg, apple-icon.tsx
 src/components/
-  sections/                  hero, problem, solution, benefits, audiences, how-it-works, faq, waitlist-section
-  waitlist-form.tsx          client form using useActionState
-  solution-page.tsx          shared solution page template
-  header.tsx, footer.tsx, ui.tsx, icons.tsx, og-card.tsx, json-ld.tsx, legal-page.tsx
-src/config/site.ts           real-world facts and placeholders
-src/content/                 copy: landing.ts, solutions.ts, audiences.ts
-src/lib/waitlist/            provider interface, validation, file provider
-src/lib/structured-data.ts   JSON-LD builders
+  landing/                   VariantPage, Hero, Why, HowItWorks, Questions, Closing, WrongDoor
+  phone/                     PhoneFrame, HelperFace, screens, lock screen, typed text
+  waitlist-button.tsx        the sign-up link; adds the hidden values on click
+  lead-pixel.tsx             fires the Pixel Lead on /thanks
+  attribution-capture.tsx    writes the fit_attr cookie
+  meta-pixel.tsx             loads the Pixel when configured
+src/config/site.ts           facts and placeholders
+src/content/                 variants.ts (page copy), audiences.ts (segment ids)
+src/lib/                     attribution, tally, tally-webhook, signups/, meta/
+scripts/                     e2e-tally, report, backfill, screenshot
 ```

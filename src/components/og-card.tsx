@@ -1,10 +1,29 @@
 import { siteConfig } from "@/config/site";
 
+/** The three-circle mark, as inline SVG for Satori. */
+function HelperMark({ size }: { size: number }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width={size} height={size}>
+      <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
+      <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
+      <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
+    </svg>
+  );
+}
+
 /**
  * Shared layout for generated Open Graph images (next/og / Satori).
  * Inline styles only; Satori does not read Tailwind classes.
  */
-export function OgCard({ headline, kicker }: { headline: string; kicker: string }) {
+export function OgCard({
+  headline,
+  kicker,
+  cta = "Join the waitlist",
+}: {
+  headline: string;
+  kicker: string;
+  cta?: string;
+}) {
   return (
     <div
       style={{
@@ -27,11 +46,7 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="64" height="64">
-            <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-            <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-            <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
-          </svg>
+          <HelperMark size={64} />
           <div style={{ fontSize: 40, fontWeight: 700 }}>{siteConfig.name}</div>
           <div style={{ fontSize: 28, color: "#4c5a57", marginLeft: 12 }}>{kicker}</div>
         </div>
@@ -69,16 +84,14 @@ export function OgCard({ headline, kicker }: { headline: string; kicker: string 
               marginLeft: 24,
             }}
           >
-            Join the waitlist
+            {cta}
           </div>
         </div>
       </div>
 
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="300" height="300" style={{ alignSelf: "center" }}>
-        <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-        <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-        <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
-      </svg>
+      <div style={{ display: "flex", alignSelf: "center" }}>
+        <HelperMark size={300} />
+      </div>
     </div>
   );
 }
