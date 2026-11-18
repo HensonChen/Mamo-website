@@ -42,8 +42,9 @@ are gitignored; put keys in `.env.local`.
 | `META_GRAPH_VERSION` | Optional. Defaults to the version in `src/lib/meta/capi.ts`. |
 | `META_CAPI_DRY_RUN=1` | Writes each Conversions API payload to `data/capi-dry-run.ndjson` instead of sending it. For tests. |
 | `TALLY_SIGNING_SECRET` | Server-only. The signing secret from the Tally webhook. Unset: the webhook answers 503 and does nothing. |
-| `SIGNUP_STORE` | Where the webhook logs signups. Default `file` (`data/signups.ndjson`). |
+| `SIGNUP_STORE` | Where the webhook logs signups: `file` (default, `data/signups.ndjson`) or `redis` (Upstash, for Vercel). |
 | `SIGNUPS_FILE_NAME` | File name inside `data/` for the file store. |
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` | With `SIGNUP_STORE=redis`: the Upstash REST URL and the read-write token. The Vercel Upstash connection provides both. The read-only token, `KV_URL` and `REDIS_URL` are not used. |
 
 ## Editing the site
 
@@ -104,9 +105,12 @@ when the URL has `fit_seg` plus `utm_medium=paid_social` or `fbclid`. The
 cookie lasts 30 days, the last paid click wins, and visiting `/` never changes
 it.
 
-`data/signups.ndjson` is a development default. On serverless hosting the
-filesystem does not persist; add a store in `src/lib/signups/` (the interface
-has two methods, `has` and `add`) and choose it with `SIGNUP_STORE`.
+`data/signups.ndjson` is the local default. On Vercel the filesystem does not
+persist, so set `SIGNUP_STORE=redis`: each record is stored as JSON under
+`signup:<submissionId>` in Upstash Redis, and the ids are in the set
+`signups:ids`. No email is stored. To read them for the report, load the same
+variables (`vercel env pull .env.local`, then `set -a; source .env.local; set +a`)
+and run `SIGNUP_STORE=redis node scripts/fb-report.mjs --ads ads.csv`.
 
 ## Facebook test: setup checklist
 
@@ -150,7 +154,7 @@ node scripts/fb-report.mjs --ads ads-export.csv \
 ```
 
 Add `--json` for machine-readable output. The report reads
-`data/signups.ndjson` and shows, per segment: spend, real signups (one per
+`data/signups.ndjson` (or Redis, with `SIGNUP_STORE=redis`) and shows, per segment: spend, real signups (one per
 Tally submission id), cost per signup with a 95% interval, Meta's leads and the
 gap from ours (above about 20% means check tracking), and signups per landing
 page view. A signup can no longer be tied to one ad, so ads are listed with

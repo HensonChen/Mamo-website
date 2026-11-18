@@ -2,7 +2,7 @@
 // Readout for the Facebook segment test.
 //
 // Joins our counted signups (written by the Tally webhook to
-// data/signups.ndjson) with an Ads Manager CSV export (one row per ad, with an
+// data/signups.ndjson, or to Upstash Redis when SIGNUP_STORE=redis) with an Ads Manager CSV export (one row per ad, with an
 // "Ad ID" column) and prints, per segment: spend, real signups, cost per real
 // signup with its 95% interval, Meta's own lead count and the gap from ours.
 // Signups are counted once per Tally submission id, per segment of the form.
@@ -14,6 +14,12 @@
 // Usage:
 //   node scripts/fb-report.mjs --ads ads.csv [--signups data/signups.ndjson]
 //        [--since 2026-12-01] [--until 2026-12-14] [--json]
+//
+// Where signups come from: the ndjson file by default. With SIGNUP_STORE=redis
+// it reads the records the webhook wrote to Upstash Redis (keys signup:<id>,
+// ids in the set signups:ids), using KV_REST_API_URL and KV_REST_API_TOKEN.
+// Load them first: set -a; source .env.local; set +a   (or `vercel env pull`).
+// --signups is ignored in that mode.
 //
 // The segment of an ad comes from its name: start every ad name with
 // "families", "seniors" or "senior-living" (see the README).
@@ -64,6 +70,42 @@ function readNdjson(path, { optional = false } = {}) {
   }
   return rows;
 }
+
+// Every signup record the webhook wrote to Upstash Redis (see src/lib/signups/redis.ts).
+async function readRedis() {
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) fail("SIGNUP_STORE=redis needs KV_REST_API_URL and KV_REST_API_TOKEN in the environment.");
+  let Redis;
+  try {
+    ({ Redis } = await import("@upstash/redis"));
+  } catch {
+    fail("Run npm install first: @upstash/redis is needed to read from Redis.");
+  }
+  const redis = new Redis({ url, token });
+  const ids = await redis.smembers("signups:ids");
+  const rows = [];
+  for (let i = 0; i < ids.length; i += 100) {
+    const batch = ids.slice(i, i + 100);
+    const values = await redis.mget(...batch.map((id) => `signup:${id}`));
+    values.forEach((value, n) => {
+      // The client parses JSON strings; accept a raw string too.
+      let record = value;
+      if (typeof value === "string") {
+        try {
+          record = JSON.parse(value);
+        } catch {
+          record = null;
+        }
+      }
+      if (record && typeof record === "object") rows.push(record);
+      else console.error(`Skipping an unreadable or missing record for ${batch[n]}`);
+    });
+  }
+  return rows;
+}
+
+const readSignups = async (path) => ((process.env.SIGNUP_STORE || "file") === "redis" ? readRedis() : readNdjson(path));
 
 // Minimal CSV parser: quotes, escaped quotes, commas and newlines inside quotes.
 function parseCsv(text) {
@@ -187,7 +229,7 @@ const inRange = (iso) => {
 };
 
 const seen = new Set();
-const entries = readNdjson(args.signups).filter((e) => {
+const entries = (await readSignups(args.signups)).filter((e) => {
   if (!e.submissionId || seen.has(e.submissionId)) return false; // One signup per Tally submission.
   seen.add(e.submissionId);
   return !e.test && inRange(e.createdAt);
