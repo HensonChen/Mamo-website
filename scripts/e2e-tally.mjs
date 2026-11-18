@@ -20,7 +20,7 @@ const SECRET = "test";
 const SIGNUPS = "data/tally-e2e.ndjson";
 const DRY_RUN = "data/capi-dry-run.ndjson";
 // The placeholder form ids in src/config/site.ts. Change these if the config has real ids.
-const FORM_IDS = { families: "PLACEHOLDER_FAMILIES", seniors: "PLACEHOLDER_SENIORS", "senior-living": "PLACEHOLDER_COMMUNITY" };
+const FORM_IDS = { families: "xVDR0d", seniors: "J1l8EK", "senior-living": "BEpjLe" };
 
 let failed = 0;
 const check = (name, ok, detail = "") => {

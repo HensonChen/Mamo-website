@@ -16,10 +16,10 @@ export const siteConfig = {
     "FamilyIT is an on-demand tech helper for older adults. They talk to it, show it their screen, and get step-by-step help, while family sets the language, the limits, and the level of help. Join the waitlist.",
 
   /** Canonical origin, no trailing slash. Used for metadataBase, sitemap, JSON-LD. */
-  url: "https://www.familyit.example.com", // PLACEHOLDER: real production domain
+  url: "https://familyit.vercel.app", // real production domain
 
   /** Shown in the footer and used for mailto links. */
-  contactEmail: "hello@familyit.example.com", // PLACEHOLDER: real contact email
+  contactEmail: "familyitapp@gmail.com", // real contact email
 
   /** Social profiles for JSON-LD sameAs. Empty array is fine. */
   socials: [] as string[], // PLACEHOLDER: e.g. "https://www.linkedin.com/company/familyit"
@@ -36,7 +36,7 @@ export const siteConfig = {
    */
   product: {
     /** Where we are in the launch. Shown near the waitlist form. */
-    launchWindow: "Early access opens in 2027", // PLACEHOLDER
+    launchWindow: "Early access in 2027. First month free, then $25/month.", // PLACEHOLDER
     /** Regions where the first wave will be available. */
     initialRegions: "the United States", // PLACEHOLDER
 
@@ -84,22 +84,22 @@ export const siteConfig = {
     tally: {
       /** One form per segment. The form id in the URL (`/r/<id>`) tells the webhook which segment it is. */
       forms: {
-        families: { url: "https://tally.so/r/PLACEHOLDER_FAMILIES" }, // PLACEHOLDER
-        seniors: { url: "https://tally.so/r/PLACEHOLDER_SENIORS" }, // PLACEHOLDER
-        "senior-living": { url: "https://tally.so/r/PLACEHOLDER_COMMUNITY" }, // PLACEHOLDER
+        families: { url: "https://tally.so/r/xVDR0d" }, // For families
+        seniors: { url: "https://tally.so/r/J1l8EK" }, // For seniors
+        "senior-living": { url: "https://tally.so/r/BEpjLe" }, // For senior living communities
       },
       /** Hidden-field names. They must match the names created in each Tally form. */
       hiddenFields: {
-        segment: "segment", // PLACEHOLDER
-        fbc: "fbc", // PLACEHOLDER
-        fbp: "fbp", // PLACEHOLDER
-        clickId: "click_id", // PLACEHOLDER
+        segment: "segment",
+        fbc: "fbc",
+        fbp: "fbp",
+        clickId: "click_id",
       },
     },
     /** Where Tally sends people after a real submit. Set as the form's redirect: /thanks?sid=@SubmissionID&seg=@segment */
     thanksPath: "/thanks",
     /** Shown near the button, so nobody is surprised to leave the site. */
-    buttonNote: "Opens a short sign-up form on tally.so",
+    buttonNote: "Get an email when early access opens.",
     /** Shown under the form buttons. */
     privacyNote:
       "We only use your email to tell you about FamilyIT. No spam, and you can leave the list with one click.",
@@ -111,7 +111,7 @@ export const siteConfig = {
   /** Paid-traffic measurement. See the README section on the Facebook test. */
   tracking: {
     /** Signups from these addresses are stored but never counted or sent to Meta. */
-    testEmails: ["test@familyit.example.com"] as string[], // PLACEHOLDER: add team addresses
+    testEmails: ["familyitapp@gmail.com"] as string[], // team email addresses
     /** A signup counts for a paid ad only within this many days of the ad click. */
     attributionWindowDays: 7,
   },

@@ -108,7 +108,8 @@ export const variants: Record<SegmentId, Variant> = {
       headline: "Be their family, not their help desk.",
       lede: "FamilyIT helps your parent with technology issues, day or night. You get a short note when it's done. Stay close and worry less, for both of you.",
       cta: "Join the waitlist",
-      priceLines: consumerPriceLines,
+      // priceLines: consumerPriceLines,
+      priceLines: [],
       image: {
         src: "/images/hero-families.jpg",
         alt: "A woman smiling at her phone in a bright kitchen, with a photo of her mother on the shelf behind her.",
@@ -135,11 +136,11 @@ export const variants: Record<SegmentId, Variant> = {
       ],
     },
     screenCopy: {
-      homeIntro: "I\u2019m FamilyIT, your tech helper. Henson set me up for you.",
+      homeIntro: "I\u2019m FamilyIT, your tech helper. Jane set me up for you.",
       openSiteMessage:
-        "I opened Evergreen\u2019s website for you. Henson saved your login. Want me to sign you in?",
-      signInMessage: "Signing you in with the login Henson saved.",
-      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Henson know.",
+        "I opened Evergreen\u2019s website for you. Jane saved your login. Want me to sign you in?",
+      signInMessage: "Signing you in with the login Jane saved.",
+      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Jane know.",
       recapWho: "Mom",
       recapAction: "Call Mom",
       noticeAskedTitle: "Mom is getting help",
@@ -192,7 +193,8 @@ export const variants: Record<SegmentId, Variant> = {
       headline: "Get tech help whenever you need it, just by talking.",
       lede: "FamilyIT helps you get things done on your own, step by step. Just tap one button and say what's wrong.",
       cta: "Join the waitlist",
-      priceLines: consumerPriceLines,
+      // priceLines: consumerPriceLines,
+      priceLines: [],
       image: {
         src: "/images/hero-seniors.jpg",
         alt: "An older woman talking to her phone from an armchair in a bright living room.",
@@ -219,11 +221,11 @@ export const variants: Record<SegmentId, Variant> = {
       ],
     },
     screenCopy: {
-      homeIntro: "I\u2019m FamilyIT, your tech helper. Henson set me up for you.",
+      homeIntro: "I\u2019m FamilyIT, your tech helper. Jane set me up for you.",
       openSiteMessage:
-        "I opened Evergreen\u2019s website for you. Henson saved your login. Want me to sign you in?",
-      signInMessage: "Signing you in with the login Henson saved.",
-      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Henson know.",
+        "I opened Evergreen\u2019s website for you. Jane saved your login. Want me to sign you in?",
+      signInMessage: "Signing you in with the login Jane saved.",
+      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Jane know.",
       recapWho: "You",
       recapAction: "Done",
       noticeAskedTitle: "You are getting help",
@@ -259,7 +261,7 @@ export const variants: Record<SegmentId, Variant> = {
     doorLine: [
       { text: "Helping a parent? " },
       { text: "For my parent", href: "/families" },
-      { text: ". Run a senior living community? " },
+      { text: ". \n Run a senior living community? " },
       { text: "For my community", href: "/senior-living" },
       { text: "." },
     ],
@@ -277,7 +279,7 @@ export const variants: Record<SegmentId, Variant> = {
     hero: {
       headline: "Your staff are trained for care, not Wi-Fi passwords.",
       lede: "FamilyIT answers residents' tech questions, so your staff can spend their time on care.",
-      cta: "Join the waitlist",
+      cta: "Request community early access",
       priceLines: [product.communityPricingNote, product.pilotNote],
       image: {
         src: "/images/hero-senior-living.jpg",

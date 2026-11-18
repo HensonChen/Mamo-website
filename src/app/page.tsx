@@ -20,7 +20,7 @@ export default function HomePage() {
       <Container className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="min-w-0 lg:col-span-6">
           <h1 id="home-heading" className="text-display font-bold text-balance text-pine lg:text-display-lg">
-            Tech help your parent can just talk to
+            Make technology easier for seniors
           </h1>
           <p className="mt-5 max-w-[34ch] text-xl leading-relaxed text-ink-soft sm:text-2xl">
             Who is FamilyIT for?
@@ -33,7 +33,7 @@ export default function HomePage() {
                   className="flex min-h-20 flex-col justify-center rounded-2xl border-2 border-line bg-white px-6 py-4 transition-colors hover:border-pine hover:bg-sage"
                 >
                   <span className="text-xl font-bold text-pine">
-                    Join the waitlist: {door.label}
+                    {door.label}
                   </span>
                   <span className="text-lg text-ink-soft">{door.sub}</span>
                 </Link>

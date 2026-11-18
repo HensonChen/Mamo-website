@@ -8,7 +8,7 @@ import type { DoorPart } from "@/content/variants";
  */
 export function WrongDoor({ parts }: { parts: DoorPart[] }) {
   return (
-    <p data-testid="wrong-door">
+    <p data-testid="wrong-door" className="whitespace-pre-line">
       {parts.map((part, index) =>
         part.href ? (
           <Link

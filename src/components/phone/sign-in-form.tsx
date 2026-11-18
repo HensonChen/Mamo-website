@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
-const EMAIL = "amber.lee@mail.com";
+const EMAIL = "janie.doe@mail.com";
 const LAST_TICK = 54;
 const BLUE = "#2B5FC4";
 const GREY = "#C9CED6";
