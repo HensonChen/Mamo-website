@@ -77,8 +77,14 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // data-scroll-behavior lets Next jump to the top of a new page
+  // without the smooth-scroll animation. In-page links stay smooth.
   return (
-    <html lang="en" className={`${body.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${body.variable} h-full`}
+      data-scroll-behavior="smooth"
+    >
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
