@@ -34,8 +34,17 @@ export type DoorPart = { text: string; href?: string };
 export type HeroImage = {
   src: string;
   alt: string;
-  /** CSS object-position on a wide screen, where the photo sits behind the copy. */
+  width: number;
+  height: number;
+  /**
+   * Desktop placement, copied from the mockup background shorthand.
+   * `position` is background-position. `size` is background-size:
+   * a width (`140% auto`, `100% auto`) or `cover`.
+   */
   position: string;
+  size: "140% auto" | "100% auto" | "cover";
+  /** Color stops for the paper fade across the photo, desktop only. */
+  fade: string;
   /** CSS object-position for the picture shown under the copy on a phone. */
   mobilePosition: string;
 };
@@ -113,7 +122,11 @@ export const variants: Record<SegmentId, Variant> = {
       image: {
         src: "/images/hero-families.jpg",
         alt: "A woman smiling at her phone in a bright kitchen, with a photo of her mother on the shelf behind her.",
-        position: "85% 30%",
+        width: 2400,
+        height: 1792,
+        position: "100% 30%",
+        size: "100% auto",
+        fade: "rgba(251, 250, 247, 0.97) 0%, rgba(251, 250, 247, 0.95) 45%, rgba(251, 250, 247, 0.6) 56%, rgba(251, 250, 247, 0) 66%",
         mobilePosition: "75% 30%",
       },
     },
@@ -198,7 +211,11 @@ export const variants: Record<SegmentId, Variant> = {
       image: {
         src: "/images/hero-seniors.jpg",
         alt: "An older woman talking to her phone from an armchair in a bright living room.",
-        position: "60% 25%",
+        width: 2576,
+        height: 1438,
+        position: "0% 20%",
+        size: "140% auto",
+        fade: "rgba(251, 250, 247, 0.97) 0%, rgba(251, 250, 247, 0.93) 36%, rgba(251, 250, 247, 0) 58%",
         mobilePosition: "55% 25%",
       },
     },
@@ -284,7 +301,11 @@ export const variants: Record<SegmentId, Variant> = {
       image: {
         src: "/images/hero-senior-living.jpg",
         alt: "A care worker chatting with residents over tea and cards in a sunlit community room.",
-        position: "75% 40%",
+        width: 2400,
+        height: 1792,
+        position: "50% 30%",
+        size: "cover",
+        fade: "rgba(251, 250, 247, 1) 0%, rgba(251, 250, 247, 1) 42%, rgba(251, 250, 247, 0.5) 58%, rgba(251, 250, 247, 0) 75%",
         mobilePosition: "70% 40%",
       },
     },

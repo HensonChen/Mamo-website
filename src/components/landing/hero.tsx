@@ -6,16 +6,20 @@ import type { Variant } from "@/content/variants";
 
 /**
  * First screen of each segment page: the promise, the price and the one
- * button. From `md` the photo fills the section behind the copy, with a paper
- * colored fade on the left so the words stay readable. On a phone the copy
- * and the button come first and the photo is a rounded picture below them, so
- * the button is on the first screen.
+ * button. From `md` the photo sits behind the copy the way the mockup's
+ * background shorthand does, with a paper fade on the left so the words stay
+ * readable. On a phone the copy and the button come first and the photo is a
+ * rounded picture below them, so the button is on the first screen.
  *
  * The section slides up under the transparent header (negative margin and
  * matching top padding).
  */
 export function Hero({ variant }: { variant: Variant }) {
   const { hero } = variant;
+  const { image } = hero;
+  const cover = image.size === "cover";
+  const [posX = "50%", posY = "50%"] = image.position.split(" ");
+
   return (
     <section
       aria-labelledby="hero-heading"
@@ -41,26 +45,38 @@ export function Hero({ variant }: { variant: Variant }) {
         </div>
       </Container>
 
-      <div
-        className="relative mx-5 mb-12 mt-10 aspect-[4/3] overflow-hidden rounded-3xl sm:mx-10 md:absolute md:inset-0 md:mx-0 md:my-0 md:aspect-auto md:rounded-none"
-        style={
-          {
-            "--pos-m": hero.image.mobilePosition,
-            "--pos-d": hero.image.position,
-          } as CSSProperties
-        }
-      >
-        <Image
-          src={hero.image.src}
-          alt={hero.image.alt}
-          fill
-          priority
-          sizes="(min-width: 768px) 100vw, 90vw"
-          className="object-cover [object-position:var(--pos-m)] md:[object-position:var(--pos-d)]"
-        />
+      <div className="relative mx-5 mb-12 mt-10 aspect-[4/3] overflow-hidden rounded-3xl sm:mx-10 md:absolute md:inset-0 md:mx-0 md:my-0 md:aspect-auto md:rounded-none">
+        <div
+          className="hero-frame"
+          data-fit={cover ? "cover" : "position"}
+          style={
+            {
+              "--pos-m": image.mobilePosition,
+              "--pos-d": image.position,
+              "--pos-x": posX,
+              "--pos-y": posY,
+              "--hero-w": cover ? "100%" : image.size.split(" ")[0],
+            } as CSSProperties
+          }
+        >
+          <Image
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+            preload
+            sizes={
+              image.size.startsWith("140%")
+                ? "(min-width: 768px) 140vw, 90vw"
+                : "(min-width: 768px) 100vw, 90vw"
+            }
+            className="hero-photo"
+          />
+        </div>
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 hidden bg-linear-to-r from-paper from-0% via-paper/95 via-55% to-paper/0 to-80% md:block"
+          className="pointer-events-none absolute inset-0 hidden md:block"
+          style={{ backgroundImage: `linear-gradient(90deg, ${image.fade})` }}
         />
       </div>
     </section>
