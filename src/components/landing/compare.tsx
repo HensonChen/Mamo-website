@@ -32,6 +32,13 @@ const cell = "px-3 py-4 text-base md:px-5 md:py-[1.125rem] md:text-xl";
 const pinnedEdge = "@max-[40rem]:border-r";
 
 /**
+ * Fills the scroll card's left padding (p-2, md:p-4). The pinned column stops
+ * at the content edge, so without this the scrolled columns show through that gap.
+ */
+const pinnedFill =
+  "before:absolute before:inset-y-[-1px] before:-left-2 before:w-2 before:bg-white before:content-[''] md:before:-left-4 md:before:w-4";
+
+/**
  * Comparison table. The table keeps a minimum width and scrolls sideways on a
  * phone, with the row labels pinned on the left so every row stays readable.
  */
@@ -45,7 +52,7 @@ export function Compare({ compare }: { compare: Variant["compare"] }) {
           <table className="w-full min-w-[40rem] border-separate border-spacing-0">
             <thead>
               <tr>
-                <td className={`sticky left-0 z-10 border-line bg-white ${pinnedEdge} ${cell} text-center`}>
+                <td className={`sticky left-0 z-10 border-line bg-white ${pinnedEdge} ${pinnedFill} ${cell} text-center`}>
                   <span className="sr-only">What you get</span>
                 </td>
                 <th scope="col" className={`rounded-t-[2rem] bg-teal font-bold text-white ${cell} text-center`}>
@@ -63,7 +70,7 @@ export function Compare({ compare }: { compare: Variant["compare"] }) {
                 <tr key={row.label}>
                   <th
                     scope="row"
-                    className={`sticky left-0 z-10 w-[22%] border-t border-line bg-white ${pinnedEdge} text-left font-bold text-teal ${cell}`}
+                    className={`sticky left-0 z-10 w-[22%] border-t border-line bg-white ${pinnedEdge} ${pinnedFill} text-left font-bold text-teal ${cell}`}
                   >
                     {row.label}
                   </th>
