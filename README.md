@@ -96,6 +96,7 @@ ad  ->  /families (cookie fit_attr written from the ad URL)
           Tally -> POST /api/tally/webhook   (signed; hashed email -> Meta CAPI "Lead")
           Tally -> redirect /thanks?sid=<submission id>&seg=<segment>
                    (page fires Pixel "Lead" with eventID = sid)
+                   (same page embeds that segment's survey, with sid and seg filled in)
 ```
 
 - **Nothing counts on click.** No Meta event is sent when the button is
@@ -119,6 +120,14 @@ ad  ->  /families (cookie fit_attr written from the ad URL)
   address with `+test`). Test submissions are logged and never sent to Meta.
 - The server sends no IP address or user agent: the webhook request comes from
   Tally's server, not the visitor.
+- **Follow-up survey.** Two Tally forms, embedded on `/thanks` only when
+  `sid` is a real submission id. `seg=families` shows the families form and
+  `seg=seniors` shows the seniors form (`siteConfig.waitlist.tally.survey.forms`).
+  Any other segment shows no survey. Hidden fields `sid` and `seg` link the
+  answers to the waitlist submission. Neither survey asks for an email, has a
+  redirect, or points a webhook at `/api/tally/webhook`. Each ending is Tally's
+  own thank-you screen. Join each survey export to the waitlist export on `sid`.
+  Leaving the survey unfinished does not drop the signup or the Lead.
 
 `AttributionCapture` writes `fit_attr` only on the two audience pages and only
 when the URL has `fit_seg` plus `utm_medium=paid_social` or `fbclid`. The
@@ -139,14 +148,21 @@ cost per real waitlist signup.
 
 1. **Tally** (one form per audience page; see `BUILD-NOTES.md` for the full list):
    hidden fields, redirect, webhook, signing secret.
-2. **Fill the placeholders** in `src/config/site.ts`: the Tally form URLs
+2. **Tally surveys** (the optional questions on `/thanks`): one form for
+   families and one for seniors. Each has hidden fields named `sid` and `seg`,
+   no email question, redirect left off, and Tally's own thank-you screen at
+   the end. Do not point a webhook at `/api/tally/webhook`, and do not add
+   either form id to `waitlist.tally.forms`. Paste each form's `/r/` URL into
+   `siteConfig.waitlist.tally.survey.forms`. Join each export to the waitlist
+   export on `sid`.
+3. **Fill the placeholders** in `src/config/site.ts`: the Tally form URLs
    and the hidden-field names.
-3. **Environment variables** from the table above.
-4. **Team addresses** in `siteConfig.tracking.testEmails`.
-5. **Privacy and terms**: replace the placeholder notice. The privacy page
+4. **Environment variables** from the table above.
+5. **Team addresses** in `siteConfig.tracking.testEmails`.
+6. **Privacy and terms**: replace the placeholder notice. The privacy page
    already says Tally collects the waitlist and that the email and ad-click id
    go to Meta on submit.
-6. **Ad URLs.** Each ad's URL parameters:
+7. **Ad URLs.** Each ad's URL parameters:
 
    ```
    utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.id}}&utm_term={{adset.id}}&utm_content={{ad.id}}&fit_seg=<segment>&fit_place={{placement}}
@@ -154,15 +170,15 @@ cost per real waitlist signup.
 
    `<segment>` is `families` or `seniors`, and the ad must open that
    audience's page.
-7. **Name every ad with its segment first**, for example `families_concept1_a`,
+8. **Name every ad with its segment first**, for example `families_concept1_a`,
    `seniors_concept1_a`. The report reads the
    segment from the name.
-8. **Ads Manager**: 7-day click attribution, 1-day view off. Columns: Ad ID,
+9. **Ads Manager**: 7-day click attribution, 1-day view off. Columns: Ad ID,
    Ad name, Amount spent, Impressions, Link clicks, Landing page views, Website
    leads. Export a CSV by ad id.
-9. **Domain verification** in Business Manager. If Events Manager still shows
+10. **Domain verification** in Business Manager. If Events Manager still shows
    Aggregated Event Measurement settings, put `Lead` first.
-10. **Smoke test before spending**: with `META_TEST_EVENT_CODE` set, submit one
+11. **Smoke test before spending**: with `META_TEST_EVENT_CODE` set, submit one
     form per audience page. Confirm each `Lead` appears in Test Events once, with one
     event id, from both the browser and the server.
 
@@ -245,7 +261,7 @@ src/app/
   layout.tsx                 font, metadata, header/footer, MetaPixel, JSON-LD
   page.tsx                   "/" home
   families/, seniors/        page.tsx + opengraph-image.tsx each
-  thanks/                    where Tally redirects; fires the Pixel Lead
+  thanks/                    where Tally redirects; fires the Pixel Lead, embeds the survey
   api/tally/webhook/route.ts signed webhook: dedupe, hash, Conversions API, log
   privacy/, terms/           legal pages
 src/components/
@@ -256,6 +272,7 @@ src/components/
   header.tsx, footer.tsx     same on every page
   waitlist-button.tsx        the sign-up link; adds the hidden values on click
   lead-pixel.tsx             fires the Pixel Lead on /thanks
+  survey-embed.tsx           the follow-up Tally survey on /thanks
   attribution-capture.tsx    writes the fit_attr cookie
   meta-pixel.tsx             loads the Pixel when configured
 src/config/site.ts           facts and placeholders

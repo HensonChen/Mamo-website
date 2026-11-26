@@ -84,6 +84,10 @@ export const siteConfig = {
    * holds only the button, the thank-you page and the webhook receiver. Tally
    * holds the questions, the hidden fields, the redirect after submit, the
    * webhook URL and the signing secret (TALLY_SIGNING_SECRET, server only).
+   *
+   * The follow-up surveys are separate Tally forms, one for families and one
+   * for seniors, embedded on the thank-you page. They are not listed in
+   * `forms`, so a survey submission is not a Lead.
    */
   waitlist: {
     tally: {
@@ -103,6 +107,25 @@ export const siteConfig = {
         fbc: "fbc",
         fbp: "fbp",
         clickId: "click_id",
+      },
+      /**
+       * Follow-up surveys embedded on /thanks after a real waitlist submit.
+       * `seg=families` shows the families form and `seg=seniors` shows the
+       * seniors form. Leave a url empty until that form exists: an empty or
+       * non-Tally value renders no iframe. These ids must stay out of `forms`.
+       * Hidden-field names must match each survey and the thank-you query string.
+       */
+      survey: {
+        forms: {
+          families: { url: "https://tally.so/embed/M1RRA0?hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" }, // For a loved one
+          seniors: { url: "https://tally.so/embed/X500k4?hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" }, // For me
+        },
+        hiddenFields: {
+          submissionId: "sid",
+          segment: "seg",
+        },
+        /** Shown on /thanks only when that segment's survey iframe is shown. */
+        prompt: "A few quick questions help us build the right Mamo. Everyone who answers gets founding-member pricing.",
       },
     },
     /** Where Tally sends people after a real submit. Set as the form's redirect: /thanks?sid=@SubmissionID&seg=@segment */

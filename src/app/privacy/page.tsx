@@ -38,6 +38,12 @@ export default function PrivacyPage() {
             .
           </li>
           <li>
+            After you join, on the thank-you page: a few optional questions.
+            That form is also run by Tally, and Tally stores the answers. We
+            connect them to your signup with the submission id from the
+            waitlist form. This website does not receive your email address.
+          </li>
+          <li>
             Which of our pages you signed up from, and the time you signed up.
           </li>
           <li>Anything you choose to tell us when you email us.</li>

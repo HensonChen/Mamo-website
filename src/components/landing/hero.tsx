@@ -6,14 +6,15 @@ import type { SegmentId } from "@/content/audiences";
 type Pebble = {
   /** Photo in /public. Without one the pebble is a plain color. */
   src?: string;
-  /** CSS object-position for the photo. */
-  position?: string;
+  /** object-position classes. The face stays in frame when the pebble is small. */
+  focus?: string;
   /** Shape class from globals.css. */
   shape: string;
   /**
    * Placement. Below `md` only two pebbles show, tucked into the corners; `md`
-   * shows three; `lg` shows all five where the mockup puts them. Widths are
-   * percentages of the card so the layout scales with it.
+   * shows three; `lg` shows all five where the mockup puts them. Widths at `lg`
+   * are percentages of the card. Below `lg` the pebbles stay mostly inside the
+   * rounded card — a large negative offset gets clipped away by the corner.
    */
   className: string;
 };
@@ -24,35 +25,34 @@ const pebbles: Pebble[] = [
     // Pink, no photo.
     shape: "blob-a bg-blush",
     className:
-      "hidden lg:block lg:bottom-[97px] lg:left-[-8.5%] lg:aspect-[206/182] lg:w-[16.7%]",
+      "block bottom-1 -right-2 w-[18%] aspect-[115/100] md:right-auto md:-bottom-8 md:-left-2 md:w-[24%] lg:block lg:bottom-[97px] lg:left-[-8.5%] lg:aspect-[206/182] lg:w-[16.7%]",
   },
   {
     src: "/images/mamo/photo-couple-tablet.jpg",
-    position: "right",
+    focus: "max-lg:object-[center_40%] lg:object-right",
     shape: "blob-c",
     className:
-      "hidden md:block md:-right-10 md:-top-10 md:h-40 md:w-44 lg:right-[-4.1%] lg:top-[-15px] lg:h-auto lg:aspect-[274/265] lg:w-[22.2%]",
+      "-right-1 -top-1 h-24 w-24 md:block md:-right-2 md:-top-2 md:h-36 md:w-32 lg:right-[-4.1%] lg:top-[-15px] lg:h-auto lg:aspect-[274/265] lg:w-[22.2%]",
   },
   {
     src: "/images/mamo/photo-elder-laptop-couch.jpg",
-    position: "center",
     shape: "blob-b",
     className:
       "hidden lg:block lg:bottom-[-41px] lg:left-[7.9%] lg:aspect-[227/211] lg:w-[18.4%]",
   },
   {
     src: "/images/mamo/photo-senior-woman-tablet.jpg",
-    position: "bottom",
+    focus: "max-lg:object-[center_70%] lg:object-bottom",
     shape: "blob-d",
     className:
-      "-left-8 -top-8 h-28 w-24 md:-left-10 md:-top-10 md:h-44 md:w-36 lg:left-[-4.7%] lg:top-[-30px] lg:h-auto lg:aspect-[283/340] lg:w-[23%]",
+      "-left-1 -top-1 h-20 w-20 sm:h-24 sm:w-24 md:-left-2 md:-top-2 md:h-36 md:w-32 lg:left-[-4.7%] lg:top-[-30px] lg:h-auto lg:aspect-[283/340] lg:w-[23%]",
   },
   {
     src: "/images/mamo/photo-man-tablet.jpg",
-    position: "center",
+    focus: "max-lg:object-[center_32%]",
     shape: "blob-c",
     className:
-      "-bottom-10 -right-8 h-28 w-24 md:-right-6 md:h-44 md:w-40 lg:bottom-[28px] lg:right-[2.4%] lg:h-auto lg:aspect-[225/251] lg:w-[18.3%]",
+      "-bottom-2 left-4 h-26 w-24 md:left-auto lg:left-auto md:bottom-2 md:right-4 md:h-42 md:w-38 lg:bottom-[28px] lg:right-[2.4%] lg:h-auto lg:aspect-[225/251] lg:w-[18.3%]",
   },
 ];
 
@@ -86,9 +86,8 @@ export function Hero({
                 src={pebble.src}
                 alt=""
                 fill
-                sizes="(min-width: 1024px) 280px, 180px"
-                className="object-cover"
-                style={{ objectPosition: pebble.position }}
+                sizes="(min-width: 1024px) 280px, 160px"
+                className={`object-cover ${pebble.focus ?? "object-center"}`}
               />
             ) : null}
           </div>
