@@ -41,54 +41,52 @@ export function Compare({ compare }: { compare: Variant["compare"] }) {
     <section aria-labelledby="compare-heading" className="pb-16 pt-6 md:pb-20 lg:pb-[6.5rem] lg:pt-10">
       <Container>
         <SectionHeading id="compare-heading">{compare.heading}</SectionHeading>
-        <div className="relative rounded-[2rem] bg-white p-2 md:p-4">
-          <div className="@container overflow-x-auto">
-            <table className="w-full min-w-[40rem] border-separate border-spacing-0">
-              <thead>
-                <tr>
-                  <td className={`sticky left-0 z-10 border-line bg-white ${pinnedEdge} ${cell} text-center`}>
-                    <span className="sr-only">What you get</span>
-                  </td>
-                  <th scope="col" className={`rounded-t-[2rem] bg-teal font-bold text-white ${cell} text-center`}>
-                    Mamo
+        <div className="@container relative overflow-x-auto rounded-[2rem] bg-white p-2 md:p-4">
+          <table className="w-full min-w-[40rem] border-separate border-spacing-0">
+            <thead>
+              <tr>
+                <td className={`sticky left-0 z-10 border-line bg-white ${pinnedEdge} ${cell} text-center`}>
+                  <span className="sr-only">What you get</span>
+                </td>
+                <th scope="col" className={`rounded-t-[2rem] bg-teal font-bold text-white ${cell} text-center`}>
+                  Mamo
+                </th>
+                {compare.others.map((name) => (
+                  <th key={name} scope="col" className={`font-bold text-teal ${cell} text-center`}>
+                    {name}
                   </th>
-                  {compare.others.map((name) => (
-                    <th key={name} scope="col" className={`font-bold text-teal ${cell} text-center`}>
-                      {name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {compare.rows.map((row, rowIndex) => (
-                  <tr key={row.label}>
-                    <th
-                      scope="row"
-                      className={`sticky left-0 z-10 w-[22%] border-t border-line bg-white ${pinnedEdge} text-left font-bold text-teal ${cell}`}
-                    >
-                      {row.label}
-                    </th>
-                    {row.cells.map((text, cellIndex) =>
-                      cellIndex === 0 ? (
-                        <td
-                          key={cellIndex}
-                          className={`border-t border-white/20 bg-teal font-bold text-white ${cell} text-center ${
-                            rowIndex === lastRow ? "rounded-b-[2rem]" : ""
-                          }`}
-                        >
-                          <Cell text={text} />
-                        </td>
-                      ) : (
-                        <td key={cellIndex} className={`border-t border-line text-teal ${cell} text-center`}>
-                          <Cell text={text} />
-                        </td>
-                      ),
-                    )}
-                  </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {compare.rows.map((row, rowIndex) => (
+                <tr key={row.label}>
+                  <th
+                    scope="row"
+                    className={`sticky left-0 z-10 w-[22%] border-t border-line bg-white ${pinnedEdge} text-left font-bold text-teal ${cell}`}
+                  >
+                    {row.label}
+                  </th>
+                  {row.cells.map((text, cellIndex) =>
+                    cellIndex === 0 ? (
+                      <td
+                        key={cellIndex}
+                        className={`border-t border-white/20 bg-teal font-bold text-white ${cell} text-center ${
+                          rowIndex === lastRow ? "rounded-b-[2rem]" : ""
+                        }`}
+                      >
+                        <Cell text={text} />
+                      </td>
+                    ) : (
+                      <td key={cellIndex} className={`border-t border-line text-teal ${cell} text-center`}>
+                        <Cell text={text} />
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Container>
     </section>
