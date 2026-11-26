@@ -1,18 +1,14 @@
 import { FaqList } from "@/components/sections/faq";
-import { Container } from "@/components/ui";
+import { Container, SectionHeading } from "@/components/ui";
 import type { Variant } from "@/content/variants";
 
-/** The three questions. A 4/8 split from `md`, stacked on a phone. */
+/** The FAQ accordion under a centered heading. */
 export function Questions({ variant }: { variant: Variant }) {
   return (
-    <section id="faq" aria-labelledby="faq-heading" className="bg-sage py-[4.5rem] md:py-28">
-      <Container className="grid gap-8 md:grid-cols-12 md:gap-16">
-        <h2 id="faq-heading" className="text-h2 font-bold text-pine md:col-span-4 lg:text-h2-lg">
-          Questions
-        </h2>
-        <div className="md:col-span-8">
-          <FaqList faqs={variant.faqs} />
-        </div>
+    <section id="faq" aria-labelledby="faq-heading" className="pb-16 pt-6 md:pb-20 lg:pb-[6.5rem] lg:pt-10">
+      <Container>
+        <SectionHeading id="faq-heading">{variant.faqHeading}</SectionHeading>
+        <FaqList faqs={variant.faqs} />
       </Container>
     </section>
   );

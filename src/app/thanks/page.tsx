@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { Container, ButtonLink } from "@/components/ui";
 import { LeadPixel } from "@/components/lead-pixel";
 import { siteConfig } from "@/config/site";
-import { isSegmentId } from "@/content/audiences";
-import { variants } from "@/content/variants";
+import { isPageSegmentId, isSegmentId, segmentPaths } from "@/content/audiences";
 import { isSubmissionId } from "@/lib/tally";
 
 export const metadata: Metadata = {
@@ -23,8 +22,9 @@ async function FromTally({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const sid = first(params.sid);
   const seg = first(params.seg);
+  // A retired segment (senior-living) has no page, so it goes back to the home page.
   const segment = isSegmentId(seg) ? seg : undefined;
-  const back = segment ? variants[segment].path : "/";
+  const back = isPageSegmentId(seg) ? segmentPaths[seg] : "/";
   return (
     <>
       {isSubmissionId(sid) ? <LeadPixel submissionId={sid} segment={segment} /> : null}
@@ -42,10 +42,10 @@ export default function ThanksPage({ searchParams }: { searchParams: SearchParam
   return (
     <section aria-labelledby="thanks-heading" className="py-16 md:py-24">
       <Container className="max-w-2xl text-center">
-        <h1 id="thanks-heading" className="text-display font-bold text-balance text-pine">
+        <h1 id="thanks-heading" className="text-display font-bold text-balance text-teal">
           {siteConfig.waitlist.successTitle}
         </h1>
-        <p className="mt-5 text-xl leading-relaxed text-ink-soft">{siteConfig.waitlist.successBody}</p>
+        <p className="mt-5 text-xl leading-relaxed text-teal-soft">{siteConfig.waitlist.successBody}</p>
         <div className="mt-8 flex justify-center">
           <Suspense fallback={<ButtonLink href="/">Back to the page</ButtonLink>}>
             <FromTally searchParams={searchParams} />

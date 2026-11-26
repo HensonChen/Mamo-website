@@ -1,6 +1,6 @@
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { fbcClickTime, isTestEmail, isWithinWindow } from "@/lib/attribution";
-import { variants } from "@/content/variants";
+import { segmentSourcePaths } from "@/content/audiences";
 import { getSignupStore, type CapiOutcome } from "@/lib/signups";
 import { segmentForFormId } from "@/lib/tally";
 import { readTallySubmission, verifyTallySignature } from "@/lib/tally-webhook";
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       eventName: "Lead",
       eventId: submission.submissionId,
       eventTime: Math.floor(eventTimeMs / 1000),
-      sourcePath: variants[segment].path,
+      sourcePath: segmentSourcePaths[segment],
       email: submission.email,
       externalId: submission.clickId ?? submission.submissionId,
       segment,

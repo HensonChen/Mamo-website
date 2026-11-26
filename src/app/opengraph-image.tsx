@@ -8,7 +8,7 @@ export const contentType = "image/png";
 
 export default function OpenGraphImage() {
   return new ImageResponse(
-    <OgCard headline="Tech help your parent can just talk to" kicker="Waitlist" cta="Join the waitlist" />,
+    <OgCard headline="Ask Mamo, the tech helper for the whole family." kicker="Waitlist" cta="Join the waitlist" />,
     size,
   );
 }

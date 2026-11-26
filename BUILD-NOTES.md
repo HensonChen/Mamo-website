@@ -1,5 +1,77 @@
 # Build notes
 
+# Mamo redesign (branch `new-design-mamo`)
+
+FamilyIT is now **Mamo**, with the new Home / For me / For a loved one design.
+The architecture is unchanged: Next.js App Router, content as data in
+`src/content/`, facts in `src/config/site.ts`, a Tally button per segment, the
+signed webhook, the `fit_attr` attribution cookie and Meta tracking. The
+sections further down describe earlier branches; where they mention the phone
+demo, the three-segment layout, `/senior-living` or the pine/plum palette, they
+no longer apply.
+
+## What changed
+
+- **Pages.** `/` (home: hero, Mom and Danny chat, "Tech help shouldn't be so
+  hard", "Who is Mamo for?", closing band), `/seniors` ("For me") and
+  `/families` ("For a loved one"). The two audience pages share one template
+  (`VariantPage`): hero, persona story, three benefits, demo video, six
+  features, comparison table, pricing with a Monthly/Annual switch, FAQ,
+  closing band. Copy is in `src/content/variants.ts` (audience pages) and
+  `src/content/home.ts` (home).
+- **Routes kept.** `/seniors` and `/families` keep their URLs, segment ids,
+  Tally forms and `fit_seg` ad values; only the nav labels changed.
+- **`/senior-living` is gone.** It redirects permanently to `/` (Next sends a
+  308), and its page, copy, share image and sitemap entry were removed. Its
+  Tally form stays in `siteConfig.waitlist.tally.forms` so the webhook still
+  logs a stray submission (`segmentSourcePaths` in `src/content/audiences.ts`).
+  `fb-report.mjs` is unchanged and still reads that segment.
+- **Header and buttons.** The header is the same on every page: "For me", "For
+  a loved one", the logo (a link home) and "Join the waitlist". Every waitlist
+  button opens the Tally form of the page it is on; the home page, privacy,
+  terms and thanks use the **families** form. Tracking fields are added on click
+  exactly as before.
+- **Demo video.** A placeholder ("Demo video coming soon") until
+  `siteConfig.demoVideo.src` is set. See the README, "Add the demo video".
+- **Responsive.** The mockups are desktop only (1280px). Breakpoints: hero
+  pebbles go from five (`lg`) to three (`md`) to two (phone); the header's two
+  links drop under the logo row below `md`; benefits are picture-left rows on a
+  tablet and stack on a phone; the comparison table scrolls sideways with the
+  row labels pinned; pricing cards stack; the hero headline steps down from 64px
+  to 40px.
+- **Identifiers.** Domain is now `https://heymamo.vercel.app`. The contact email
+  (`familyitapp@gmail.com`), the `fit_attr` cookie and the `fit_seg` parameter
+  were deliberately not renamed.
+
+## Things you need to do outside the repo
+
+- **Tally:** change each form's webhook URL and the redirect
+  (`/thanks?sid=@SubmissionID&seg=<segment>`) to `heymamo.vercel.app`, and
+  rename FamilyIT in the form text. The old senior-living form can stay as is.
+- **Meta:** verify the new domain in Business Manager and point the ads at it.
+  Existing ad URLs on `familyit.vercel.app` keep working only while that domain
+  stays up.
+- **Vercel:** add `heymamo.vercel.app` as the production domain.
+- Replace the remaining `PLACEHOLDER` values in `src/config/site.ts` (legal
+  name, contact email, socials) and the privacy/terms text.
+
+## Decisions
+
+- Prices live in `siteConfig.product.plans` and are read by the pricing section,
+  the comparison table ("From $19.99/mo") and the FAQ text, so they change in
+  one place.
+- The FAQ is a native `<details name="faq">` accordion (one open at a time, first
+  one open), so it works without JavaScript.
+- The home chat plays once when it scrolls into view. With JavaScript off, or for
+  visitors who prefer reduced motion, the whole thread is shown at once.
+- The comparison table's check and dash cells read as "Yes" and "No" to a screen
+  reader.
+- The Figtree font comes from `next/font/google`, as the mockups use it.
+- The privacy note ("We only use your email to tell you about Mamo...") stays
+  under the closing button, which the mockup does not show.
+
+---
+
 # v1: new design, Tally sign-up (branch `landing-build-v1`)
 
 Built on the local branch `landing-build-v1`, from `landing-build`. **Nothing

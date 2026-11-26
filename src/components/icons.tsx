@@ -1,83 +1,55 @@
 import type { ReactNode, SVGProps } from "react";
 
-/** Minimal inline icons. Decorative unless a `title` is given. */
-export type IconName =
-  | "chevron"
-  | "check"
-  | "mail"
-  | "menu"
-  | "close"
-  | "lock"
-  | "mic"
-  | "clock"
-  | "sliders"
-  | "building"
-  | "people"
-  | "card"
-  | "help";
+/** Minimal inline icons, drawn as in the mockups. Decorative unless a `title` is given. */
+export type IconName = "check" | "setup" | "pointer" | "mic" | "shield" | "people" | "history" | "play";
 
 const paths: Record<IconName, ReactNode> = {
-  chevron: <path d="m6 9 6 6 6-6" />,
-  check: <path d="m5 12.5 4.5 4.5L19 7" />,
-  mail: (
+  check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  setup: (
     <>
-      <rect x="3" y="5.5" width="18" height="13" rx="2" />
-      <path d="m3.5 7 8.5 6 8.5-6" />
+      <rect x="3" y="4.5" width="18" height="12" rx="2.5" />
+      <path d="M8.5 20h7" />
+      <path d="M12 16.5V20" />
+      <path d="M9 10.5l2 2 4-4" />
     </>
   ),
-  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
-  close: <path d="M6 6l12 12M18 6 6 18" />,
-  lock: (
+  pointer: (
     <>
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+      <path d="M9 3.5v2" />
+      <path d="M4.5 9H2.5" />
+      <path d="M5.6 5.6L4.2 4.2" />
+      <path d="M9.5 9.5l10 4-4.2 1.7-1.7 4.3z" />
     </>
   ),
   mic: (
     <>
-      <rect x="9" y="3" width="6" height="11" rx="3" />
-      <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+      <rect x="9" y="2.5" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+      <path d="M12 17.5v3.5" />
     </>
   ),
-  clock: (
+  shield: (
     <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3.5 2" />
-    </>
-  ),
-  sliders: (
-    <>
-      <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
-      <circle cx="15" cy="7" r="2" />
-      <circle cx="9" cy="17" r="2" />
-    </>
-  ),
-  building: (
-    <>
-      <path d="M4 21V8l8-5 8 5v13M2 21h20" />
-      <path d="M9 21v-6h6v6M9 11h.01M15 11h.01" />
+      <path d="M12 2.5l7.5 3v6c0 4.6-3.2 8.4-7.5 10-4.3-1.6-7.5-5.4-7.5-10v-6z" />
+      <path d="M8.8 12l2.2 2.2 4.2-4.4" />
     </>
   ),
   people: (
     <>
-      <circle cx="9" cy="8" r="3.5" />
-      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-      <circle cx="17" cy="9" r="2.5" />
-      <path d="M17 14a5 5 0 0 1 4.5 5" />
+      <circle cx="8.5" cy="8" r="3" />
+      <circle cx="16.5" cy="9" r="2.5" />
+      <path d="M3 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+      <path d="M14.5 14.6c.6-.2 1.3-.3 2-.3 2.3 0 4 1.5 4.5 4.2" />
     </>
   ),
-  card: (
+  history: (
     <>
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <path d="M3 10h18M7 15h4" />
+      <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />
+      <path d="M3.5 4v4.5H8" />
+      <path d="M12 7.5V12l3 2" />
     </>
   ),
-  help: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8M12 17h.01" />
-    </>
-  ),
+  play: <path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="none" />,
 };
 
 type IconProps = SVGProps<SVGSVGElement> & { name: IconName; title?: string };
@@ -104,11 +76,22 @@ export function Icon({ name, title, className, ...rest }: IconProps) {
   );
 }
 
-/**
- * Brand mark: three overlapping circles (family, helper, you), from the
- * landing mockup.
- */
-export function Mark({ className, title }: { className?: string; title?: string }) {
+/** The Mamo blob face path, shared with the Open Graph card. */
+export const MARK_PATH =
+  "M65.91 51.2 C88.76 38.63 126.28 41.91 138 44 C165.64 48.92 184 70 180 106 C176 142 150 166 112 168 C78 170 39.87 162.06 26 132 C14 106 25.91 73.2 65.91 51.2 Z";
+
+/** The blob face. `fill` is the blob, `face` the eyes and smile. */
+export function Mark({
+  className,
+  title,
+  fill = "#113C42",
+  face = "#FFFFFF",
+}: {
+  className?: string;
+  title?: string;
+  fill?: string;
+  face?: string;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -119,9 +102,25 @@ export function Mark({ className, title }: { className?: string; title?: string 
       focusable="false"
     >
       {title ? <title>{title}</title> : null}
-      <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-      <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-      <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
+      <path d={MARK_PATH} fill={fill} />
+      <circle cx="86" cy="104" r="7" fill={face} />
+      <circle cx="126" cy="100" r="7.5" fill={face} />
+      <path d="M90 126 Q110 141 130 122" fill="none" stroke={face} strokeWidth="6" strokeLinecap="round" />
     </svg>
+  );
+}
+
+/** The logo lockup: blob face and the lowercase "mamo" wordmark. */
+export function Logo({ size = "lg", className = "" }: { size?: "lg" | "sm"; className?: string }) {
+  const big = size === "lg";
+  return (
+    <span
+      className={`inline-flex items-center font-bold tracking-[-0.04em] text-teal ${
+        big ? "gap-1.5 text-[1.75rem] sm:text-[2.125rem]" : "gap-1.5 text-[1.625rem]"
+      } ${className}`}
+    >
+      <Mark className={big ? "size-9 sm:size-[2.875rem]" : "size-9"} />
+      <span>mamo</span>
+    </span>
   );
 }

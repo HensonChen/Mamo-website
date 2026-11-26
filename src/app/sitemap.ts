@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl, siteConfig } from "@/config/site";
-import { segmentIds } from "@/content/audiences";
+import { pageSegmentIds } from "@/content/audiences";
 import { variants } from "@/content/variants";
 
 const lastModified = new Date(siteConfig.lastModified);
@@ -8,7 +8,7 @@ const lastModified = new Date(siteConfig.lastModified);
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: absoluteUrl("/"), lastModified, changeFrequency: "monthly", priority: 1 },
-    ...segmentIds.map((id) => ({
+    ...pageSegmentIds.map((id) => ({
       url: absoluteUrl(variants[id].path),
       lastModified,
       changeFrequency: "monthly" as const,

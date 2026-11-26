@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-/** Page gutter and max width. */
+/** Page gutter and max width. Content is 1184px wide on a large screen, as in the mockups. */
 export function Container({
   className = "",
   children,
@@ -10,18 +10,39 @@ export function Container({
   children: ReactNode;
 }) {
   return (
-    <div className={`mx-auto w-full max-w-6xl px-5 sm:px-10 ${className}`}>{children}</div>
+    <div className={`mx-auto w-full max-w-[80rem] px-5 sm:px-8 lg:px-12 ${className}`}>{children}</div>
   );
 }
 
-type ButtonVariant = "primary" | "secondary";
+/** Centered section heading used by every section in the mockups. */
+export function SectionHeading({
+  id,
+  children,
+  className = "",
+}: {
+  id?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <h2
+      id={id}
+      className={`mx-auto mb-8 max-w-[47.5rem] text-center text-h2 font-bold text-balance text-teal lg:mb-10 lg:text-h2-lg ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+
+type ButtonVariant = "primary" | "secondary" | "sun";
 
 const buttonBase =
-  "inline-flex min-h-14 items-center justify-center gap-3 rounded-full px-7 text-xl font-bold transition-colors duration-150";
+  "inline-flex min-h-14 items-center justify-center gap-3 rounded-full px-7 text-lg font-bold transition-colors duration-150";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-plum text-white hover:bg-plum-deep",
-  secondary: "border-2 border-edge bg-white text-ink hover:bg-chip",
+  primary: "bg-teal text-white hover:bg-teal-soft",
+  secondary: "border-2 border-teal bg-white text-teal hover:bg-sand",
+  sun: "bg-sun text-teal hover:bg-sun-deep",
 };
 
 type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: ButtonVariant };
@@ -44,7 +65,7 @@ export function ButtonLink({
 export function TextLink({ className = "", children, ...rest }: ComponentProps<typeof Link>) {
   return (
     <Link
-      className={`font-bold text-link underline decoration-2 underline-offset-4 hover:text-plum ${className}`}
+      className={`font-bold text-teal underline decoration-2 underline-offset-4 hover:text-teal-soft ${className}`}
       {...rest}
     >
       {children}
