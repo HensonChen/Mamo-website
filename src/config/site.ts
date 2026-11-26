@@ -74,9 +74,9 @@ export const siteConfig = {
    * WebVTT file, e.g. "/videos/mamo-demo.en.vtt") are optional.
    */
   demoVideo: {
-    src: null as string | null, // PLACEHOLDER: "/videos/mamo-demo.mp4"
-    poster: null as string | null,
-    captions: null as string | null,
+    src: "/videos/mamo-demo.mp4", // PLACEHOLDER: "/videos/mamo-demo.mp4"
+    poster: "/images/mamo/mamo-poster-landscape.png",
+    captions: "/videos/mamo-demo.en.vtt",
   },
 
   /**
