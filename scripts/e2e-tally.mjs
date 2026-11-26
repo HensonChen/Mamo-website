@@ -22,6 +22,36 @@ const DRY_RUN = "data/capi-dry-run.ndjson";
 // The placeholder form ids in src/config/site.ts. Change these if the config has real ids.
 const FORM_IDS = { families: "xVDR0d", seniors: "J1l8EK", "senior-living": "BEpjLe" };
 
+/** The follow-up survey links from site config. Empty until those forms exist. */
+function tallyId(url) {
+  if (!url) return undefined;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || parsed.host !== "tally.so") return undefined;
+    return /^\/(?:r|embed)\/([A-Za-z0-9_-]+)\/?$/.exec(parsed.pathname)?.[1];
+  } catch {
+    return undefined;
+  }
+}
+
+function readSurvey() {
+  const src = readFileSync("src/config/site.ts", "utf8");
+  const start = src.indexOf("survey:");
+  const slice = start === -1 ? "" : src.slice(start, start + 1200);
+  const familiesUrl = /families:\s*\{\s*url:\s*"([^"]*)"/.exec(slice)?.[1] ?? "";
+  const seniorsUrl = /seniors:\s*\{\s*url:\s*"([^"]*)"/.exec(slice)?.[1] ?? "";
+  const sidName = /submissionId:\s*"([^"]+)"/.exec(slice)?.[1] ?? "sid";
+  const segName = /segment:\s*"([^"]+)"/.exec(slice)?.[1] ?? "seg";
+  return {
+    forms: { families: tallyId(familiesUrl), seniors: tallyId(seniorsUrl) },
+    sidName,
+    segName,
+  };
+}
+
+const pageText = (html) => html.replaceAll("&amp;", "&").replaceAll("\\u0026", "&");
+const embedIn = (html) => pageText(html).match(/https:\/\/tally\.so\/embed\/[A-Za-z0-9_?=&.%-]+/)?.[0];
+
 let failed = 0;
 const check = (name, ok, detail = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${ok ? "" : detail ? `  (${detail})` : ""}`);
@@ -176,14 +206,59 @@ async function main() {
     const other = JSON.stringify({ eventType: "FORM_RESPONSE_EDITED", data: {} });
     check("other event types are ignored", (await post(other)).json.ignored !== undefined);
 
-    // Thank-you page.
+    // Thank-you page. Each segment embeds its own survey, and only that one.
+    const survey = readSurvey();
+    const configured = Object.values(survey.forms).filter(Boolean);
+    for (const id of configured) {
+      check("survey form is not a waitlist form", !Object.values(FORM_IDS).includes(id), id);
+    }
     const thanks = await (await fetch(`${BASE}/thanks?sid=abc123&seg=families`)).text();
+    const seniorsThanks = await (await fetch(`${BASE}/thanks?sid=abc123&seg=seniors`)).text();
     check("/thanks?sid=abc123 renders the Lead component", /abc123/.test(thanks) && /submissionId/.test(thanks));
+    check("/thanks for seniors renders the Lead component", /abc123/.test(seniorsThanks) && /submissionId/.test(seniorsThanks));
     const bare = await (await fetch(`${BASE}/thanks`)).text();
     check("/thanks without sid does not", !/submissionId/.test(bare));
     const bad = await (await fetch(`${BASE}/thanks?sid=${encodeURIComponent("<script>x</script>")}`)).text();
     check("/thanks with a bad sid does not", !/submissionId/.test(bad));
     check("/thanks is noindex", /noindex/.test(thanks));
+    const thanksEmbed = embedIn(thanks);
+    const seniorsEmbed = embedIn(seniorsThanks);
+    check("/thanks without sid has no survey embed", !embedIn(bare));
+    check("/thanks with a bad sid has no survey embed", !embedIn(bad));
+    if (configured.length) {
+      for (const [segment, id] of Object.entries(survey.forms)) {
+        const embed = segment === "families" ? thanksEmbed : seniorsEmbed;
+        if (id) {
+          const other = segment === "families" ? survey.forms.seniors : survey.forms.families;
+          check(
+            `/thanks seg=${segment} embeds that survey`,
+            Boolean(embed) &&
+              embed.includes(`/embed/${id}`) &&
+              embed.includes(`${survey.sidName}=abc123`) &&
+              embed.includes(`${survey.segName}=${segment}`) &&
+              !/email|fbc|fbp|click_id/i.test(embed) &&
+              !(other && other !== id && embed.includes(`/embed/${other}`)),
+            embed ?? "",
+          );
+        } else {
+          check(`/thanks seg=${segment} has no survey embed`, !embed);
+        }
+      }
+      const unknownSeg = await (await fetch(`${BASE}/thanks?sid=abc123&seg=nope`)).text();
+      const retired = await (await fetch(`${BASE}/thanks?sid=abc123&seg=senior-living`)).text();
+      check("/thanks with an unknown segment has no survey embed", !embedIn(unknownSeg));
+      check("/thanks for senior-living has no survey embed", !embedIn(retired));
+      check("/thanks hides the waitlist button while a survey is configured", !/data-testid="waitlist-button"/.test(thanks));
+      check(
+        "/thanks hides the way back while the survey is showing",
+        !/>Back to the page</.test(thanks) && !/>Back to the page</.test(seniorsThanks),
+      );
+      check("/thanks without a survey still shows the way back", />Back to the page</.test(unknownSeg));
+    } else {
+      check("/thanks has no families survey embed until that URL is set", !thanksEmbed);
+      check("/thanks has no seniors survey embed until that URL is set", !seniorsEmbed);
+      check("/thanks keeps the waitlist button until a survey URL is set", /data-testid="waitlist-button"/.test(thanks));
+    }
     const sitemap = await (await fetch(`${BASE}/sitemap.xml`)).text();
     check("sitemap leaves out /thanks", !sitemap.includes("/thanks"));
     check("sitemap leaves out /senior-living", !sitemap.includes("/senior-living"));

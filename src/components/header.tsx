@@ -6,6 +6,7 @@ import { Logo } from "@/components/icons";
 import { Container } from "@/components/ui";
 import { WaitlistButton } from "@/components/waitlist-button";
 import { pageSegmentIds, segmentPaths, type SegmentId } from "@/content/audiences";
+import { hasSurveyForm } from "@/lib/tally";
 
 const navLink =
   "inline-flex min-h-12 items-center rounded-lg text-base font-bold text-teal hover:underline hover:decoration-2 hover:underline-offset-4";
@@ -18,11 +19,15 @@ const navLink =
  * centered under them, so every link stays visible without a menu.
  *
  * The button opens the Tally form of the page you are on. Pages without an
- * audience (the home page, privacy, terms) use the families form.
+ * audience (the home page, privacy, terms) use the families form. On /thanks,
+ * once either survey URL is set, the button is hidden so the survey is the next step.
  */
 export function Header() {
   const pathname = usePathname();
   const segment: SegmentId = pageSegmentIds.find((id) => segmentPaths[id] === pathname) ?? "families";
+  // On the thank-you page the survey is the next step. The waitlist button would
+  // send someone who just signed up back into the form.
+  const hideWaitlist = pathname === "/thanks" && hasSurveyForm();
 
   return (
     <header className="relative z-10">
@@ -46,7 +51,7 @@ export function Header() {
           <Logo />
         </Link>
         <div className="order-2 justify-self-end md:order-3">
-          <WaitlistButton segment={segment} placement="header" size="sm" />
+          {hideWaitlist ? null : <WaitlistButton segment={segment} placement="header" size="sm" />}
         </div>
       </Container>
     </header>
