@@ -1,56 +1,32 @@
 /**
- * Copy and settings for the three segment landing pages. Everything a page
- * says lives here as plain data, so the layout components stay generic.
+ * Copy and settings for the two audience landing pages, "For me" (/seniors)
+ * and "For a loved one" (/families). Everything a page says lives here as plain
+ * data, so the layout components stay generic.
  *
- * Price, trial, community pricing and safety wording come from
- * `siteConfig.product`; they are referenced here, never retyped.
+ * Price, trial and the demo video come from `siteConfig`; they are referenced
+ * here, never retyped.
  */
 
 import { siteConfig } from "@/config/site";
-import type { SegmentId } from "@/content/audiences";
+import type { PageSegmentId } from "@/content/audiences";
+import type { IconName } from "@/components/icons";
 
 const { product } = siteConfig;
 
-/** Which demo screen to draw. Each maps to a component in src/components/phone. */
-export type ScreenId =
-  | "home"
-  | "listening"
-  | "clarify"
-  | "answering"
-  | "email"
-  | "opensite"
-  | "signin"
-  | "explain"
-  | "confirmed"
-  | "idle"
-  | "notice-asked"
-  | "notice-login"
-  | "notice-done"
-  | "recap";
-
-/** One piece of the "Not you?" line: plain text, or a link to another page. */
-export type DoorPart = { text: string; href?: string };
-
-export type HeroImage = {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  /**
-   * Desktop placement, copied from the mockup background shorthand.
-   * `position` is background-position. `size` is background-size:
-   * a width (`140% auto`, `100% auto`) or `cover`.
-   */
-  position: string;
-  size: "140% auto" | "100% auto" | "cover";
-  /** Color stops for the paper fade across the photo, desktop only. */
-  fade: string;
-  /** CSS object-position for the picture shown under the copy on a phone. */
-  mobilePosition: string;
+/** A decorative blob behind a drawing. Position and size are percentages of the picture box. */
+export type BlobSpec = {
+  shape: "blob-a" | "blob-b" | "blob-c" | "blob-d" | "blob-e" | "blob-f";
+  color: "sun" | "blush";
+  left: string;
+  top: string;
+  width: string;
+  height: string;
+  /** Degrees. */
+  rotate?: number;
 };
 
 export type Variant = {
-  id: SegmentId;
+  id: PageSegmentId;
   /** Route, no trailing slash. */
   path: string;
   /** Short label used in structured data and OG images. */
@@ -59,140 +35,58 @@ export type Variant = {
   hero: {
     headline: string;
     lede: string;
-    /** Button text. */
-    cta: string;
-    /** Price or pricing lines shown above the button. */
-    priceLines: string[];
-    image: HeroImage;
   };
-  /** The slogan and the three numbered points under the hero. */
-  why: { slogan: string; points: [string, string, string] };
-  howItWorks: {
+  /** The persona story under the hero. */
+  problem: {
     heading: string;
-    /** "solo": one phone. "family": the parent's phone and the family member's phone. */
-    mode: "solo" | "family";
-    /** Four labels, one per step. */
-    steps: [string, string, string, string];
+    image: { src: string; alt: string; width: number; height: number; widthPercent: number };
+    blob: BlobSpec;
+    lead: string;
+    body: string;
   };
-  /** Wording for the helper screens, so they fit who is looking at the page. */
-  screenCopy: {
-    homeIntro: string;
-    openSiteMessage: string;
-    signInMessage: string;
-    confirmedMessage: string;
-    recapWho: string;
-    recapAction: string;
-    noticeAskedTitle: string;
-    noticeAskedBody: string;
-    noticeLoginTitle: string;
-    noticeLoginBody: string;
-    noticeDoneTitle: string;
-    noticeDoneBody: string;
+  /** Three sketches with a short title and line each. */
+  benefits: {
+    heading: string;
+    items: {
+      title: string;
+      body: string;
+      image: { src: string; alt: string; width: number; height: number; widthPercent: number };
+      blob: BlobSpec;
+    }[];
   };
+  demo: {
+    heading: string;
+    /** Same file for both pages by default. Set it in `siteConfig.demoVideo`. */
+    video: { src: string | null; poster: string | null; captions: string | null };
+  };
+  features: {
+    heading: string;
+    items: { icon: IconName; title: string; body: string }[];
+  };
+  compare: {
+    heading: string;
+    /** Column titles after "Mamo". */
+    others: string[];
+    /** Each row: its label, then the Mamo cell, then one cell per entry in `others`. */
+    rows: { label: string; cells: string[] }[];
+  };
+  pricing: {
+    familyBlurb: string;
+    familyPerks: string[];
+    plusBlurb: string;
+    plusPerks: string[];
+  };
+  faqHeading: string;
   faqs: { question: string; answer: string }[];
   closing: {
     heading: string;
     sub: string;
-    cta: string;
-    note: string;
   };
-  doorLine: DoorPart[];
 };
 
-const consumerPriceLines = [`${product.consumerPrice}, ${product.trialNote}.`];
+const trial = product.trialNote.charAt(0).toUpperCase() + product.trialNote.slice(1);
 
-const closingNote = siteConfig.waitlist.privacyNote;
-
-export const variants: Record<SegmentId, Variant> = {
-  families: {
-    id: "families",
-    path: "/families",
-    label: "For my parent",
-    meta: {
-      title: "Be their family, not their help desk",
-      description:
-        "FamilyIT helps your parent with technology issues, day or night. You get a short note when it's done. Stay close and worry less. Join the waitlist.",
-    },
-    hero: {
-      headline: "Be their family, not their help desk.",
-      lede: "FamilyIT helps your parent with technology issues, day or night. You get a short note when it's done. Stay close and worry less, for both of you.",
-      cta: "Join the waitlist",
-      // priceLines: consumerPriceLines,
-      priceLines: [],
-      image: {
-        src: "/images/hero-families.jpg",
-        alt: "A woman smiling at her phone in a bright kitchen, with a photo of her mother on the shelf behind her.",
-        width: 2400,
-        height: 1792,
-        position: "100% 30%",
-        size: "100% auto",
-        fade: "rgba(251, 250, 247, 0.97) 0%, rgba(251, 250, 247, 0.95) 45%, rgba(251, 250, 247, 0.6) 56%, rgba(251, 250, 247, 0) 66%",
-        mobilePosition: "75% 30%",
-      },
-    },
-    why: {
-      slogan: "Less worrying. More time together.",
-      points: [
-        "Help seniors with everyday tech issues.",
-        "Families get real time notifications.",
-        "Peace of mind, with you in control.",
-      ],
-    },
-    howItWorks: {
-      heading: "How it works",
-      mode: "family",
-      steps: [
-        "Mom asks for help, just by talking",
-        "You get a heads-up she's getting help",
-        "You're told when your login is used",
-        "Done. You get the recap",
-      ],
-    },
-    screenCopy: {
-      homeIntro: "I\u2019m FamilyIT, your tech helper. Jane set me up for you.",
-      openSiteMessage:
-        "I opened Evergreen\u2019s website for you. Jane saved your login. Want me to sign you in?",
-      signInMessage: "Signing you in with the login Jane saved.",
-      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Jane know.",
-      recapWho: "Mom",
-      recapAction: "Call Mom",
-      noticeAskedTitle: "Mom is getting help",
-      noticeAskedBody: "Mom asked FamilyIT about a message from her car insurance.",
-      noticeLoginTitle: "Mom used the insurance login you saved.",
-      noticeLoginBody: "With her OK, she\u2019s now signed in to Evergreen.",
-      noticeDoneTitle: "Mom confirmed her updated car insurance policy.",
-      noticeDoneBody: "No action needed from you.",
-    },
-    faqs: [
-      {
-        question: "Will I see everything my parent does?",
-        answer:
-          "You see a summary of what FamilyIT helped with. Your parent is told what is shared, and setup starts with a conversation about it.",
-      },
-      {
-        question: "Can I be involved even though I live far away?",
-        answer:
-          "Yes. You can set things up and receive updates, while your parent handles their own day-to-day. How involved you are is up to your parent.",
-      },
-      {
-        question: "What if it makes a mistake?",
-        answer:
-          "FamilyIT guides and explains each step. For sensitive steps like payments or forms, it asks your parent to confirm, and it can ask you to approve, depending on the level you choose.",
-      },
-    ],
-    closing: {
-      heading: "Be first to try FamilyIT.",
-      sub: `${product.launchWindow}.`,
-      cta: "Join the waitlist",
-      note: closingNote,
-    },
-    doorLine: [
-      { text: "Run a senior living community? " },
-      { text: "For my community", href: "/senior-living" },
-      { text: "." },
-    ],
-  },
-
+export const variants: Record<PageSegmentId, Variant> = {
   seniors: {
     id: "seniors",
     path: "/seniors",
@@ -200,188 +94,318 @@ export const variants: Record<SegmentId, Variant> = {
     meta: {
       title: "Get tech help whenever you need it, just by talking",
       description:
-        "Tap one button and say what's wrong. FamilyIT helps you get things done on your own, step by step. Join the waitlist.",
+        "Just say what you need, and Mamo takes care of it for you. No waiting for your kids. Join the Mamo waitlist.",
     },
     hero: {
       headline: "Get tech help whenever you need it, just by talking.",
-      lede: "FamilyIT helps you get things done on your own, step by step. Just tap one button and say what's wrong.",
-      cta: "Join the waitlist",
-      // priceLines: consumerPriceLines,
-      priceLines: [],
+      lede: "Just say what you need, and Mamo takes care of it for you.",
+    },
+    problem: {
+      heading: "Sometimes the hard part isn\u2019t knowing how.",
       image: {
-        src: "/images/hero-seniors.jpg",
-        alt: "An older woman talking to her phone from an armchair in a bright living room.",
-        width: 2576,
-        height: 1438,
-        position: "0% 20%",
-        size: "140% auto",
-        fade: "rgba(251, 250, 247, 0.97) 0%, rgba(251, 250, 247, 0.93) 36%, rgba(251, 250, 247, 0) 58%",
-        mobilePosition: "55% 25%",
+        src: "/images/mamo/margaret-portrait.png",
+        alt: "Line drawing of Margaret, with curly hair and round glasses",
+        width: 704,
+        height: 686,
+        widthPercent: 80,
       },
+      blob: { shape: "blob-f", color: "sun", left: "50%", top: "30%", width: "64%", height: "68%", rotate: 7 },
+      lead: "\u201cI want to do this myself, without calling my son 2,000 miles away.\u201d",
+      body: "Margaret was writing computer programs back in the 1980s, so she knows her way around technology. But when her doctor asks her to turn on the camera during a Zoom visit, she can\u2019t find the button. She could call her son Danny, but he\u2019s busy and far away in another state, and she doesn\u2019t want to be one more thing on his list.",
     },
-    why: {
-      slogan: "You don't have to be techy to get things done.",
-      points: [
-        "Just talk, no typing needed.",
-        "Get help anytime, step by step.",
-        "Stay safe from scams.",
+    benefits: {
+      heading: "What Mamo does for you",
+      items: [
+        {
+          title: "Finish the hard tasks",
+          body: "Fix your microphone, connect your Bluetooth earbuds, or join a video call with family. Just ask, and Mamo does it.",
+          image: {
+            src: "/images/mamo/seniors-benefit-1.png",
+            alt: "Sketch illustrating Finish the hard tasks",
+            width: 800,
+            height: 600,
+            widthPercent: 92,
+          },
+          blob: { shape: "blob-e", color: "sun", left: "18%", top: "30%", width: "46%", height: "52%" },
+        },
+        {
+          title: "Check before you click",
+          body: "Not sure a message or call is real? Ask Mamo first.",
+          image: {
+            src: "/images/mamo/seniors-benefit-2.png",
+            alt: "Sketch illustrating Check before you click",
+            width: 800,
+            height: 600,
+            widthPercent: 92,
+          },
+          blob: { shape: "blob-f", color: "blush", left: "40%", top: "18%", width: "46%", height: "52%" },
+        },
+        {
+          title: "You\u2019re always in control",
+          body: "Mamo asks before it acts and stops if anything looks wrong.",
+          image: {
+            src: "/images/mamo/seniors-benefit-3.png",
+            alt: "Sketch illustrating You\u2019re always in control",
+            width: 800,
+            height: 600,
+            widthPercent: 80,
+          },
+          blob: { shape: "blob-c", color: "sun", left: "30%", top: "34%", width: "46%", height: "52%" },
+        },
       ],
     },
-    howItWorks: {
-      heading: "How it works",
-      mode: "solo",
-      steps: [
-        "Ask out loud",
-        "It checks my email is real",
-        "It signs me in, with my OK",
-        "Tap Confirm. Done.",
+    demo: { heading: "How Mamo works", video: siteConfig.demoVideo },
+    features: {
+      heading: "Everything Mamo can do",
+      items: [
+        {
+          icon: "setup",
+          title: "Easy to set up",
+          body: "Get started in a few minutes, on your own or with help from a family member.",
+        },
+        {
+          icon: "pointer",
+          title: "Gets things done for you",
+          body: "Just tell Mamo what you need, like joining a doctor\u2019s visit, finding an email, or turning on the mic.",
+        },
+        {
+          icon: "mic",
+          title: "Just talk",
+          body: "No menus or new apps to learn. Ask out loud, and Mamo takes care of it.",
+        },
+        {
+          icon: "shield",
+          title: "Scam check, every time",
+          body: "If a link or message looks suspicious, Mamo stops and tells you why before anything happens.",
+        },
+        {
+          icon: "people",
+          title: "Family in the loop",
+          body: "When you\u2019d like, Mamo lets your family know a task is done, so no one has to worry.",
+        },
+        {
+          icon: "history",
+          title: "See what Mamo did",
+          body: "Look back anytime at what Mamo did for you.",
+        },
       ],
     },
-    screenCopy: {
-      homeIntro: "I\u2019m FamilyIT, your tech helper. Jane set me up for you.",
-      openSiteMessage:
-        "I opened Evergreen\u2019s website for you. Jane saved your login. Want me to sign you in?",
-      signInMessage: "Signing you in with the login Jane saved.",
-      confirmedMessage: "All done! Evergreen got your confirmation. I\u2019ve let Jane know.",
-      recapWho: "You",
-      recapAction: "Done",
-      noticeAskedTitle: "You are getting help",
-      noticeAskedBody: "You asked FamilyIT about a message from your car insurance.",
-      noticeLoginTitle: "FamilyIT signed you in.",
-      noticeLoginBody: "With your OK.",
-      noticeDoneTitle: "You confirmed your updated car insurance policy.",
-      noticeDoneBody: "All done.",
+    compare: {
+      heading: "Why not just call family?",
+      others: ["Calling your family", "In-person tech help"],
+      rows: [
+        { label: "Help when you need it", cells: ["Anytime", "When they are free", "Business hours"] },
+        { label: "Done right away", cells: ["\u2713", "Sometimes", "\u2013"] },
+        { label: "No trip needed", cells: ["\u2713", "\u2713", "\u2013"] },
+        { label: "Cost", cells: [`From ${product.fromPrice}/mo`, "Free, but you wait", "About $100 per visit"] },
+      ],
     },
+    pricing: {
+      familyBlurb: "Just for you",
+      familyPerks: ["Help with any task on your computer", trial],
+      plusBlurb: "For you and your spouse or partner",
+      plusPerks: ["Everything in Family", "Two people in the same home", trial],
+    },
+    faqHeading: "What people are asking",
     faqs: [
       {
-        question: "Can it see everything on my screen?",
-        answer:
-          "It only sees what you choose to share during a session. Your family can also block websites, so it cannot open pages they have ruled out.",
+        question: "Do I need to be good with computers?",
+        answer: "No. If you can talk, you can use Mamo. Just ask, and Mamo handles it.",
       },
       {
-        question: "Will my family see everything I do?",
+        question: "Can Mamo do things for me, or just tell me what to do?",
         answer:
-          "Your family sees a summary of what FamilyIT helped with. You are told what is shared, and setup starts with a conversation about it.",
+          "It does them for you. With your OK, Mamo opens the Zoom link, turns on your mic, or finds the right email.",
       },
       {
-        question: "How is it different from a chatbot?",
+        question: "Will Mamo see my passwords or bank details?",
         answer:
-          "A chatbot tells you what to do. FamilyIT talks with you, sees your screen, and guides you through each step as it happens.",
+          "No. Mamo never types your passwords or payment details. When a task needs them, it pauses and you type them yourself.",
+      },
+      {
+        question: "Will my family see what I\u2019m doing?",
+        answer:
+          "Only the tasks Mamo helps you with. Your connected family can see those steps, so they know things went well. Everything else on your computer stays private.",
+      },
+      {
+        question: "What do I need to get started?",
+        answer:
+          "A computer. Setup takes a few minutes, on your own or with help from a family member. We\u2019re also building Mamo for phones and tablets.",
+      },
+      {
+        question: "When can I start, and what will it cost?",
+        answer: `Mamo launches in early 2027. Join the waitlist today; there\u2019s no charge now. At launch, plans start at ${product.fromPrice} a month, with a 30-day free trial.`,
       },
     ],
     closing: {
-      heading: "Be first to try FamilyIT.",
-      sub: `${product.launchWindow}.`,
-      cta: "Join the waitlist",
-      note: closingNote,
+      heading: "Be the first to try Mamo",
+      sub: "Get early access when we launch in early 2027. Free to join.",
     },
-    doorLine: [
-      { text: "Helping a parent? " },
-      { text: "For my parent", href: "/families" },
-      { text: ". \n Run a senior living community? " },
-      { text: "For my community", href: "/senior-living" },
-      { text: "." },
-    ],
   },
 
-  "senior-living": {
-    id: "senior-living",
-    path: "/senior-living",
-    label: "For my community",
+  families: {
+    id: "families",
+    path: "/families",
+    label: "For a loved one",
     meta: {
-      title: "Your staff are trained for care, not Wi-Fi passwords",
+      title: "Help your parents with tech, even when you\u2019re not there",
       description:
-        "FamilyIT answers residents' tech questions, so your staff can spend their time on care. Request early access for your community.",
+        "Mamo takes care of the tasks your parents used to call you about, and shows you how each one got solved. Join the Mamo waitlist.",
     },
     hero: {
-      headline: "Your staff are trained for care, not Wi-Fi passwords.",
-      lede: "FamilyIT answers residents' tech questions, so your staff can spend their time on care.",
-      cta: "Request community early access",
-      priceLines: [product.communityPricingNote, product.pilotNote],
+      headline: "Help your parents with tech, even when you\u2019re not there.",
+      lede: "Mamo takes care of the tasks your parents used to call you about, and shows you how each one got solved.",
+    },
+    problem: {
+      heading: "Be their family, not their IT help desk.",
       image: {
-        src: "/images/hero-senior-living.jpg",
-        alt: "A care worker chatting with residents over tea and cards in a sunlit community room.",
-        width: 2400,
-        height: 1792,
-        position: "50% 30%",
-        size: "cover",
-        fade: "rgba(251, 250, 247, 1) 0%, rgba(251, 250, 247, 1) 42%, rgba(251, 250, 247, 0.5) 58%, rgba(251, 250, 247, 0) 75%",
-        mobilePosition: "70% 40%",
+        src: "/images/mamo/danny-portrait.png",
+        alt: "Line drawing of Danny in a shirt and tie",
+        width: 616,
+        height: 706,
+        widthPercent: 70,
       },
+      blob: { shape: "blob-e", color: "blush", left: "50%", top: "32%", width: "64%", height: "68%", rotate: -6 },
+      lead: "Meet Danny \u2014 a busy son who lives 2,000 miles from his mom.",
+      body: "Danny often travels overseas for work. When his mom calls about a video visit or a strange text, he\u2019s in a meeting or on a flight and can\u2019t help in the moment. She lives alone, and he can\u2019t stop wondering: is she using tech safely when he can\u2019t pick up?",
     },
-    why: {
-      slogan: "More time for care. Less time on tech support.",
-      points: [
-        "Staff time returns to care.",
-        "Residents protected from scams.",
-        "Helps your community stand out.",
+    benefits: {
+      heading: "Your parents get help. You get peace of mind.",
+      items: [
+        {
+          title: "Help, whenever they need it",
+          body: "Your parent just asks, and Mamo gets it done, any time of day.",
+          image: {
+            src: "/images/mamo/families-benefit-1.png",
+            alt: "Sketch illustrating Help, whenever they need it",
+            width: 800,
+            height: 600,
+            widthPercent: 92,
+          },
+          blob: { shape: "blob-e", color: "sun", left: "27%", top: "28%", width: "49%", height: "56%" },
+        },
+        {
+          title: "You stay in the loop",
+          body: "Get notified when a task is done, and see each step Mamo took to help.",
+          image: {
+            src: "/images/mamo/families-benefit-2.png",
+            alt: "Sketch illustrating You stay in the loop",
+            width: 800,
+            height: 600,
+            widthPercent: 92,
+          },
+          blob: { shape: "blob-f", color: "blush", left: "40%", top: "18%", width: "46%", height: "52%" },
+        },
+        {
+          title: "Safer by design",
+          body: "Mamo checks for scams before it takes action, and never touches passwords or payments.",
+          image: {
+            src: "/images/mamo/families-benefit-3.png",
+            alt: "Sketch illustrating Safer by design",
+            width: 800,
+            height: 600,
+            widthPercent: 80,
+          },
+          blob: { shape: "blob-c", color: "sun", left: "30%", top: "34%", width: "46%", height: "52%" },
+        },
       ],
     },
-    howItWorks: {
-      heading: "How it works",
-      mode: "solo",
-      steps: [
-        "A resident asks out loud",
-        "It checks the email is real",
-        "It signs them in, with their OK",
-        "They tap Confirm. Done.",
+    demo: { heading: "How Mamo works", video: siteConfig.demoVideo },
+    features: {
+      heading: "Everything Mamo can do",
+      items: [
+        {
+          icon: "setup",
+          title: "Easy setup",
+          body: "Install on your parent\u2019s devices in a few minutes, together or remotely.",
+        },
+        {
+          icon: "pointer",
+          title: "Gets things done for them",
+          body: "Your parent just tells Mamo what they need, like joining a doctor\u2019s visit, finding an email, or turning on the mic.",
+        },
+        {
+          icon: "mic",
+          title: "Just talk",
+          body: "No menus or new apps to learn. Your parent asks out loud, and Mamo takes care of it.",
+        },
+        {
+          icon: "shield",
+          title: "Scam check, every time",
+          body: "If a link or message looks suspicious, Mamo stops, explains why, and lets you know.",
+        },
+        {
+          icon: "people",
+          title: "Real-time notifications",
+          body: "Get a heads-up on your phone the moment a task is done, or right away if something needs you.",
+        },
+        {
+          icon: "history",
+          title: "See every step",
+          body: "Look back at exactly how Mamo helped, whenever you have a minute.",
+        },
       ],
     },
-    screenCopy: {
-      homeIntro: "I\u2019m FamilyIT, your tech helper. Your community set me up for you.",
-      openSiteMessage:
-        "I opened Evergreen\u2019s website for you. Your saved login is ready. Want me to sign you in?",
-      signInMessage: "Signing you in with your saved login.",
-      confirmedMessage: "All done! Evergreen got your confirmation.",
-      recapWho: "A resident",
-      recapAction: "Call resident",
-      noticeAskedTitle: "A resident is getting help",
-      noticeAskedBody: "A resident asked FamilyIT about a message from their car insurance.",
-      noticeLoginTitle: "A resident used the login you saved.",
-      noticeLoginBody: "With their OK, they\u2019re now signed in.",
-      noticeDoneTitle: "A resident confirmed their updated car insurance policy.",
-      noticeDoneBody: "No action needed from you.",
+    compare: {
+      heading: "How Mamo compares",
+      others: ["Doing it yourself", "In-home tech visit", "Other tech-help services"],
+      rows: [
+        {
+          label: "Help when your parent needs it",
+          cells: ["Anytime", "When you\u2019re free", "By appointment", "Varies"],
+        },
+        { label: "Done right away", cells: ["\u2713", "Sometimes", "\u2013", "Sometimes"] },
+        { label: "You stay informed", cells: ["\u2713", "\u2713", "\u2013", "\u2013"] },
+        {
+          label: "Cost",
+          cells: [`From ${product.fromPrice}/mo`, "Your time", "About $100 per visit", "About $20\u201330/mo"],
+        },
+      ],
     },
+    pricing: {
+      familyBlurb: "For one parent",
+      familyPerks: ["Updates and controls on your phone", trial],
+      plusBlurb: "For both parents in one home",
+      plusPerks: ["Everything in Family", "Two seniors in the same home", trial],
+    },
+    faqHeading: "What families are asking",
     faqs: [
       {
-        question: "How does this fit alongside our existing IT provider?",
+        question: "How does setup work?",
         answer:
-          "We don't touch your clinical or corporate systems. We cover residents' personal devices and coordinate with your IT provider where the two meet, such as resident Wi-Fi.",
+          "Install Mamo on your parent\u2019s computer in a few minutes, either sitting together or remotely.",
       },
       {
-        question: "What do our staff need to do?",
+        question: "Can Mamo see my parent\u2019s passwords or bank details?",
         answer:
-          "Announce the service and share a resident list. FamilyIT onboards residents and answers their tech questions, so your front desk doesn't have to.",
+          "No. Mamo never types passwords or payment details. When a task needs them, it pauses and your parent types them.",
       },
       {
-        question: "Who pays: the center or the family?",
+        question: "What do I see on my side?",
         answer:
-          "We're designing for both models and will discuss what suits your community during early access. Join the waitlist and tell us about your community.",
+          "A notification on your phone when a task is done or something needs you, plus a step-by-step history of the tasks Mamo helped with. Only those tasks are shared; the rest of your parent\u2019s computer stays private. You can pause Mamo anytime.",
+      },
+      {
+        question: "What happens if Mamo spots a scam?",
+        answer: "It stops before taking any action, explains the risk to your parent, and alerts you right away.",
+      },
+      {
+        question: "What if my parent doesn\u2019t want help from an app?",
+        answer:
+          "Mamo doesn\u2019t feel like an app. There are no menus or new screens to learn. Your parent just talks, and Mamo answers patiently, as many times as they need.",
+      },
+      {
+        question: "What will it cost?",
+        answer: `Mamo launches in early 2027, and joining the waitlist is free. At launch, Family is ${product.plans.family.monthly} a month (${product.plans.family.yearly} a year), and Family Plus covers two parents at home for ${product.plans.familyPlus.monthly} a month. Both start with a 30-day free trial.`,
       },
     ],
     closing: {
-      heading: "Request early access for your community",
-      sub: "No commitment. We'll write to you about a pilot.",
-      cta: "Request early access",
-      note: closingNote,
+      heading: "Be the first to try Mamo",
+      sub: "Get early access for your family when we launch in early 2027. Free to join.",
     },
-    doorLine: [
-      { text: "Looking for help for yourself or a parent? " },
-      { text: "For me", href: "/seniors" },
-      { text: ". " },
-      { text: "For my parent", href: "/families" },
-      { text: "." },
-    ],
   },
 };
 
-export function getVariant(id: SegmentId): Variant {
+export function getVariant(id: PageSegmentId): Variant {
   return variants[id];
 }
-
-/** The three doors on `/`. Order matches the product's likely buyer first. */
-export const doors = [
-  { label: "For my parent", sub: "I help a parent with their tech", href: "/families" },
-  { label: "For me", sub: "I want tech help I can just talk to", href: "/seniors" },
-  { label: "For my community", sub: "I run a senior living community", href: "/senior-living" },
-] as const;

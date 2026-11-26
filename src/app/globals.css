@@ -1,48 +1,44 @@
 @import "tailwindcss";
 
 /*
- * Design tokens, taken from the updated landing mockup.
- * One typeface (Atkinson Hyperlegible, designed for low-vision readers),
- * a warm paper page, pine and sage sections, and one plum for every action.
- * The phone screens keep the app's own blue; they are drawn with fixed colors.
+ * Design tokens, taken from the Mamo landing mockups.
+ * One typeface (Figtree), a warm sand page, deep teal bands and cards,
+ * a sunny yellow for every action on teal, and a blush accent.
  */
 @theme {
-  --color-paper: #fbfaf7;
-  --color-sage: #e6ede6;
-  --color-pine: #244b43;
-  --color-pine-2: #2e5a50;
-  --color-plum: #7c3c5c;
-  --color-plum-deep: #66304b;
-  --color-link: #3e6b5e;
-  --color-ink: #1e2a28;
-  --color-ink-soft: #4c5a57;
-  --color-line: #c9d6cb;
-  --color-chip: #eef1ec;
-  --color-edge: #7a8799;
-  --color-ok: #1e6b47;
-  --color-ok-bg: #e9f5ee;
-  --color-ok-line: #b5dbc4;
+  --color-sand: #edebe2;
+  --color-teal: #113c42;
+  --color-teal-soft: #2b4c51;
+  --color-sun: #eedc5b;
+  --color-sun-deep: #e3d03a;
+  --color-blush: #e4b9ae;
+  --color-line: #d2d3cb;
   --color-alert: #a02424;
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: 2.75rem;
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.025em;
-  --text-display-lg: 4.25rem;
-  --text-display-lg--line-height: 1.05;
-  --text-display-lg--letter-spacing: -0.025em;
-  --text-h2: 2.5rem;
-  --text-h2--line-height: 1.15;
-  --text-h2--letter-spacing: -0.02em;
-  --text-h2-lg: 2.75rem;
-  --text-h2-lg--line-height: 1.1;
-  --text-h2-lg--letter-spacing: -0.02em;
+  /* Mockup sizes are 64 / 48 / 26 / 20 at desktop; each has a smaller phone step. */
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.03em;
+  --text-display-lg: 4rem;
+  --text-display-lg--line-height: 1.02;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-h2: 2rem;
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h2-lg: 3rem;
+  --text-h2-lg--line-height: 1.08;
+  --text-h2-lg--letter-spacing: -0.025em;
+  --text-h3: 1.375rem;
+  --text-h3--line-height: 1.25;
+  --text-h3-lg: 1.625rem;
+  --text-h3-lg--line-height: 1.25;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: 1.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -54,155 +50,98 @@ html {
   *::after {
     transition-duration: 0.01ms !important;
   }
-  .helper-look,
-  .helper-blink,
-  .anim {
-    animation: none !important;
-  }
 }
 
 body {
-  background-color: var(--color-paper);
-  color: var(--color-ink);
+  background-color: var(--color-sand);
+  color: var(--color-teal);
   font-family: var(--font-sans);
   font-size: 1.125rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 /* Keyboard focus: thick, high-contrast, consistent. */
 :focus-visible {
-  outline: 3px solid var(--color-plum);
+  outline: 3px solid var(--color-teal);
   outline-offset: 3px;
   border-radius: 0.5rem;
 }
-
-::selection {
-  background: var(--color-line);
+.on-teal :focus-visible {
+  outline-color: var(--color-sun);
 }
 
-/* Native <details>: hide the default marker, rotate the chevron when open. */
+::selection {
+  background: var(--color-sun);
+}
+
+/* Native <details>: hide the default marker. */
 details > summary {
   list-style: none;
 }
 details > summary::-webkit-details-marker {
   display: none;
 }
-details[open] .details-chevron {
-  transform: rotate(180deg);
-}
-
-/* The helper character from the demo: eyes drift and blink. */
-@keyframes helper-look {
-  0%,
-  12% {
-    transform: translate(0, 0);
-  }
-  18%,
-  30% {
-    transform: translate(-9px, 0);
-  }
-  36%,
-  48% {
-    transform: translate(0, -8px);
-  }
-  54%,
-  66% {
-    transform: translate(9px, 0);
-  }
-  72%,
-  84% {
-    transform: translate(0, 6px);
-  }
-  90%,
-  100% {
-    transform: translate(0, 0);
-  }
-}
-@keyframes helper-blink {
-  0%,
-  94%,
-  100% {
-    transform: scaleY(1);
-  }
-  96% {
-    transform: scaleY(0.1);
-  }
-}
-.helper-look {
-  animation: helper-look 6s ease-in-out infinite;
-}
-.helper-blink {
-  animation: helper-blink 6s infinite;
-}
-
-/* Hide the scrollbar on the swipeable storyboard row but keep it scrollable. */
-.swipe-row {
-  scrollbar-width: none;
-}
-.swipe-row::-webkit-scrollbar {
+/* The + becomes a minus when the question is open. */
+details .faq-minus {
   display: none;
 }
+details[open] .faq-plus {
+  display: none;
+}
+details[open] .faq-minus {
+  display: inline;
+}
 
-/* Phone screen animations, ported from the mockup's screens. */
-@keyframes wave {
-  0%,
-  100% {
-    transform: scaleY(0.35);
+/* Organic "pebble" shapes from the mockups. */
+.blob-a {
+  border-radius: 38% 62% 55% 45% / 42% 38% 62% 58%;
+}
+.blob-b {
+  border-radius: 45% 55% 62% 38% / 58% 42% 58% 42%;
+}
+.blob-c {
+  border-radius: 60% 40% 35% 65% / 50% 60% 40% 50%;
+}
+.blob-d {
+  border-radius: 55% 45% 40% 60% / 38% 55% 45% 62%;
+}
+.blob-e {
+  border-radius: 58% 42% 46% 54% / 52% 44% 56% 48%;
+}
+.blob-f {
+  border-radius: 46% 54% 40% 60% / 56% 44% 56% 44%;
+}
+
+/* Chat scene on the home page. */
+@keyframes chat-in {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.9);
   }
-  50% {
-    transform: scaleY(1);
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }
-@keyframes sheetup {
-  from {
-    transform: translateY(100%);
-  }
-  to {
+@keyframes chat-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
     transform: translateY(0);
   }
-}
-@keyframes popin {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
+  40% {
     opacity: 1;
-    transform: none;
+    transform: translateY(-3px);
   }
 }
-@keyframes botin {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes talk {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.07);
-  }
-}
-@keyframes notif {
-  from {
-    opacity: 0;
-    transform: translateY(-18px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes fadein {
+@keyframes chat-fade {
   from {
     opacity: 0;
   }
@@ -210,46 +149,31 @@ details[open] .details-chevron {
     opacity: 1;
   }
 }
-
-/*
- * Desktop hero photo. The mockup sizes the picture as a background
- * (`140% auto`, `100% auto`, or `cover`) and then places it with
- * background-position. Cover maps to object-fit. A width does not:
- * the frame is that wide, and the translate is the background-position
- * formula, (container − image) × position.
- */
-.hero-frame {
-  position: absolute;
-  inset: 0;
+.chat-in {
+  animation: chat-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: 50% 100%;
+  flex-shrink: 0;
 }
-
-.hero-photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: var(--pos-m);
+.chat-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #575757;
+  margin: 0 3px;
+  animation: chat-dot 1.2s infinite;
 }
-
-@media (min-width: 48rem) {
-  .hero-frame[data-fit="position"] {
-    inset: auto;
-    width: var(--hero-w);
-    left: var(--pos-x);
-    top: var(--pos-y);
-    transform: translate(calc(var(--pos-x) * -1), calc(var(--pos-y) * -1));
+.chat-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.chat-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-in {
+    animation: chat-fade 0.6s ease-out both;
   }
-
-  .hero-frame[data-fit="position"] .hero-photo {
-    position: relative;
-    inset: auto;
-    width: 100%;
-    height: auto;
-  }
-
-  .hero-frame[data-fit="cover"] .hero-photo {
-    object-position: var(--pos-d);
+  .chat-dot {
+    animation: none;
   }
 }

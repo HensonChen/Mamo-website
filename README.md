@@ -1,21 +1,24 @@
-# FamilyIT waitlist site
+# Mamo waitlist site
 
-Pre-launch site for FamilyIT, a voice-and-screen AI tech helper for older
-adults. It has three landing pages, one per go-to-market segment, built to test
-which segment signs up at the lowest cost on Facebook:
+Pre-launch site for Mamo (formerly FamilyIT), a voice-first AI tech helper for
+older adults and the families who care about them. It has two audience landing
+pages, built to test which audience signs up at the lowest cost on Facebook:
 
-| Route | Segment | Who it is for |
+| Route | Nav label | Who it is for |
 | --- | --- | --- |
-| `/families` | Adult children | "Be their family, not their help desk." |
-| `/seniors` | Older adults | "Tech help whenever you need it. Just talk." |
-| `/senior-living` | Senior living operators | "Your staff are trained for care, not Wi-Fi passwords." |
-| `/` | none | A one-screen chooser with three doors. Never an ad destination. |
+| `/families` | For a loved one | Adult children: "Help your parents with tech, even when you're not there." |
+| `/seniors` | For me | Older adults: "Get tech help whenever you need it, just by talking." |
+| `/` | none | Home: "Ask Mamo, the tech helper for the whole family." Sends visitors to one of the two. Never an ad destination. |
 | `/thanks` | none | Where Tally sends people after a real submit. Not indexed. |
+
+`/senior-living` was retired with the Mamo redesign and redirects to `/`. Its
+Tally form is still accepted by the webhook, so a late submission is logged.
 
 Next.js (App Router), TypeScript, Tailwind CSS. Static pages plus one webhook
 route. No CMS, auth or database. **There is no sign-up form on this site.**
-Each segment page has a button that opens a Tally form (tally.so, free plan)
-in the same tab. Tally collects the email and answers.
+Each "Join the waitlist" button opens a Tally form (tally.so, free plan) in the
+same tab: the form of the page you are on, or the families form on pages with
+no audience (home, privacy, terms). Tally collects the email and answers.
 
 ## Run it
 
@@ -23,7 +26,7 @@ Requires Node.js 20.9 or newer (Next.js 16's minimum) and npm.
 
 ```bash
 git clone git@github.com:HensonChen/familyit-landing.git
-cd familyit-landing
+cd familyit-landing   # the repository keeps its old name
 npm install
 npm run dev      # http://localhost:3000
 npm run lint
@@ -50,26 +53,43 @@ are gitignored; put keys in `.env.local`.
 
 | To change… | Edit |
 | --- | --- |
-| Facts: domain, contact email, launch window, prices, test addresses, Tally form URLs and hidden-field names, thank-you text | `src/config/site.ts` |
-| Everything a segment page says (hero, why points, steps, phone captions, FAQ, closing) | `src/content/variants.ts` |
+| Facts: domain, contact email, launch window, prices, demo video, test addresses, Tally form URLs and hidden-field names, thank-you text | `src/config/site.ts` |
+| Everything an audience page says (hero, persona story, benefits, features, comparison table, pricing blurbs, FAQ, closing) | `src/content/variants.ts` |
+| Everything the home page says (hero, chat, persona cards, "Who is Mamo for?") | `src/content/home.ts` |
 | The segment ids | `src/content/audiences.ts` |
-| The phone pictures | `src/components/phone/` |
-| Page layout and styling | `src/components/landing/`, `src/app/globals.css` |
+| Pictures (photos, sketches, portraits) | `public/images/mamo/` |
+| Page layout and styling, colors, fonts | `src/components/landing/`, `src/app/globals.css` |
 | Privacy and terms text | `src/app/privacy/page.tsx`, `src/app/terms/page.tsx` |
-| Questions asked at sign-up (name, community, anything else) | In Tally, not in this repo |
+| Questions asked at sign-up (name, anything else) | In Tally, not in this repo |
 
-The three pages share one template (`VariantPage`) so that results differ
-because of words and pictures, not layout. Price, trial and safety wording are
-written once in `siteConfig.product` and referenced from the content file.
+The two audience pages share one template (`VariantPage`) so that results
+differ because of words and pictures, not layout. Price, trial and the demo
+video are written once in `siteConfig` and referenced from the content file.
+
+### Add the demo video
+
+The "How Mamo works" section shows a "Demo video coming soon" card until a
+video is set. To publish it:
+
+1. Put the MP4 in `public/videos/` (for example `public/videos/mamo-demo.mp4`).
+2. In `src/config/site.ts`, set `demoVideo.src` to `"/videos/mamo-demo.mp4"`.
+3. Optional: a still image for `demoVideo.poster` (for example
+   `/videos/mamo-demo-poster.jpg`), and a WebVTT captions file for
+   `demoVideo.captions` (for example `/videos/mamo-demo.en.vtt`). Captions are
+   worth adding for an audience that includes people who are hard of hearing.
+
+The same video shows on both audience pages. Pressing play swaps in a native
+player with controls; nothing is downloaded before then. Keep the file small
+(a few MB, H.264) because Vercel serves it from the same host.
 
 Old `/solutions/*` URLs redirect (see `next.config.ts`): seniors to
-`/seniors`, care centers to `/senior-living`, the two removed audiences to `/`.
+`/seniors`, and every other old page, including `/senior-living`, to `/`.
 
 ## How a signup works
 
 ```
 ad  ->  /families (cookie fit_attr written from the ad URL)
-    ->  "Join the waitlist" button (a plain link to the Tally form)
+    ->  any "Join the waitlist" button on the page (a plain link to the Tally form)
           on click, adds ?segment=families&fbc=...&fbp=...&click_id=...
     ->  Tally form (same tab)
     ->  submit
@@ -100,7 +120,7 @@ ad  ->  /families (cookie fit_attr written from the ad URL)
 - The server sends no IP address or user agent: the webhook request comes from
   Tally's server, not the visitor.
 
-`AttributionCapture` writes `fit_attr` only on the three segment pages and only
+`AttributionCapture` writes `fit_attr` only on the two audience pages and only
 when the URL has `fit_seg` plus `utm_medium=paid_social` or `fbclid`. The
 cookie lasts 30 days, the last paid click wins, and visiting `/` never changes
 it.
@@ -114,12 +134,12 @@ and run `SIGNUP_STORE=redis node scripts/fb-report.mjs --ads ads.csv`.
 
 ## Facebook test: setup checklist
 
-Paid ads send to the three segment pages only, never to `/`. Decision metric:
+Paid ads send to the two audience pages only, never to `/`. Decision metric:
 cost per real waitlist signup.
 
-1. **Tally** (one form per segment; see `BUILD-NOTES.md` for the full list):
+1. **Tally** (one form per audience page; see `BUILD-NOTES.md` for the full list):
    hidden fields, redirect, webhook, signing secret.
-2. **Fill the placeholders** in `src/config/site.ts`: the three Tally form URLs
+2. **Fill the placeholders** in `src/config/site.ts`: the Tally form URLs
    and the hidden-field names.
 3. **Environment variables** from the table above.
 4. **Team addresses** in `siteConfig.tracking.testEmails`.
@@ -132,10 +152,10 @@ cost per real waitlist signup.
    utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.id}}&utm_term={{adset.id}}&utm_content={{ad.id}}&fit_seg=<segment>&fit_place={{placement}}
    ```
 
-   `<segment>` is `families`, `seniors` or `senior-living`, and the ad must
-   open that segment's page.
+   `<segment>` is `families` or `seniors`, and the ad must open that
+   audience's page.
 7. **Name every ad with its segment first**, for example `families_concept1_a`,
-   `seniors_concept1_a`, `senior-living_concept1_a`. The report reads the
+   `seniors_concept1_a`. The report reads the
    segment from the name.
 8. **Ads Manager**: 7-day click attribution, 1-day view off. Columns: Ad ID,
    Ad name, Amount spent, Impressions, Link clicks, Landing page views, Website
@@ -143,7 +163,7 @@ cost per real waitlist signup.
 9. **Domain verification** in Business Manager. If Events Manager still shows
    Aggregated Event Measurement settings, put `Lead` first.
 10. **Smoke test before spending**: with `META_TEST_EVENT_CODE` set, submit one
-    form per page. Confirm each `Lead` appears in Test Events once, with one
+    form per audience page. Confirm each `Lead` appears in Test Events once, with one
     event id, from both the browser and the server.
 
 ### Reading the result
@@ -164,8 +184,8 @@ Decision rule (fixed before launch): the segment with the lowest cost per
 signup wins if the runner-up costs at least 1.5 times more, or the 95% interval
 on the cost ratio excludes 1. Otherwise it is a tie, broken by signup quality
 (Tally's own export has the answers) and then strategy. Do not stop early. A
-weak `/senior-living` result can be a channel result, since Facebook's reach
-among operators is thin.
+segment that stopped getting ads (such as the retired `senior-living`)
+will show few signups because of the budget, not the audience.
 
 If a Conversions API call failed, the event is kept in
 `data/capi-failures.ndjson`. Resend while Meta still accepts it (7 days):
@@ -180,28 +200,31 @@ node scripts/capi-backfill.mjs
 
 Everything factual lives in **`src/config/site.ts`**; search for `PLACEHOLDER`:
 the domain, legal name, contact email, socials, launch window, regions, prices
-and trial wording, community pricing and pilot notes, Tally URLs and field
+and trial wording, the demo video, Tally URLs and field
 names, and test addresses.
 
 Also: the privacy and terms pages show a visible "Placeholder" notice from
 `src/components/legal-page.tsx`. Remove it once the text is reviewed.
 
-## Design (v1)
+## Design (Mamo)
 
-- Typeface: Atkinson Hyperlegible, designed by the Braille Institute for
-  low-vision readers. Body text is 18px, buttons are 64px tall, focus rings are
-  thick.
-- Palette: paper `#fbfaf7`, sage `#e6ede6`, pine `#244b43` (headings and dark
-  bands), plum `#7c3c5c` (every primary action), ink `#1e2a28`, ink-soft
-  `#4c5a57`. Tokens are in `src/app/globals.css`.
-- Sections of a segment page: photo hero with the sign-up button, "why" points,
-  "How it works" with a phone demo, FAQ, closing band.
-- "How it works" plays by itself once it scrolls into view and loops. It has a
-  pause button and step buttons. For visitors who prefer reduced motion it does
-  not start by itself.
-- The phone screens in `src/components/phone/` are drawn at 390 x 844 and
-  scaled with the CSS variable `--s`; they keep the app's own blues. They
-  shrink to fit a 360px screen (two phones side by side on family pages).
+- Typeface: Figtree (400 to 800), loaded with `next/font/google`. Body text is
+  18px on a phone and 20px on desktop; buttons are 48 to 60px tall, focus rings
+  are thick.
+- Palette (tokens in `src/app/globals.css`): sand `#edebe2` page, teal
+  `#113c42` (headings, cards and bands), teal-soft `#2b4c51` (body text), sun
+  `#eedc5b` (buttons on teal, icon tiles), blush `#e4b9ae` (accent), line
+  `#d2d3cb`. Organic "pebble" shapes are the `blob-*` classes.
+- Sections of an audience page: teal hero card with photo pebbles, persona
+  story, three benefit sketches, "How Mamo works" video, six features,
+  comparison table, launch pricing (Monthly/Annual switch), FAQ, closing band.
+- The mockups were desktop only. Responsive rules: the hero shows five photo
+  pebbles from 1024px, three from 768px and two on a phone; the header's links
+  move under the logo row below 768px; the comparison table scrolls sideways
+  with the row labels pinned; every other grid stacks. No horizontal scroll from
+  320px up.
+- The home page chat plays once as it scrolls into view and is shown in full
+  for visitors who prefer reduced motion.
 
 ## Scripts
 
@@ -220,20 +243,25 @@ Also: the privacy and terms pages show a visible "Placeholder" notice from
 ```
 src/app/
   layout.tsx                 font, metadata, header/footer, MetaPixel, JSON-LD
-  page.tsx                   "/" three-door chooser
-  families/, seniors/, senior-living/   page.tsx + opengraph-image.tsx each
+  page.tsx                   "/" home
+  families/, seniors/        page.tsx + opengraph-image.tsx each
   thanks/                    where Tally redirects; fires the Pixel Lead
   api/tally/webhook/route.ts signed webhook: dedupe, hash, Conversions API, log
   privacy/, terms/           legal pages
 src/components/
-  landing/                   VariantPage, Hero, Why, HowItWorks, Questions, Closing, WrongDoor
-  phone/                     PhoneFrame, HelperFace, screens, lock screen, typed text
+  landing/                   VariantPage and its sections (Hero, Problem, Benefits, DemoVideo,
+                             Features, Compare, Pricing, Questions, Closing); home sections
+                             (ChatScene, Pain, Paths)
+  sections/faq.tsx           the accordion
+  header.tsx, footer.tsx     same on every page
   waitlist-button.tsx        the sign-up link; adds the hidden values on click
   lead-pixel.tsx             fires the Pixel Lead on /thanks
   attribution-capture.tsx    writes the fit_attr cookie
   meta-pixel.tsx             loads the Pixel when configured
 src/config/site.ts           facts and placeholders
-src/content/                 variants.ts (page copy), audiences.ts (segment ids)
+src/content/                 variants.ts (audience pages), home.ts, audiences.ts (segment ids)
 src/lib/                     attribution, tally, tally-webhook, signups/, meta/
+public/images/mamo/          photos and sketches from the design
+public/videos/               the demo video goes here
 scripts/                     e2e-tally, report, backfill, screenshot
 ```

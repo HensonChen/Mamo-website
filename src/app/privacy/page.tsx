@@ -16,7 +16,7 @@ export default function PrivacyPage() {
         <p>
           {siteConfig.legalName} (&ldquo;{siteConfig.name}&rdquo;,
           &ldquo;we&rdquo;) is building a voice and screen tech helper for older
-          adults, their families and senior living communities. You can reach us
+          adults and their families. You can reach us
           at {siteConfig.contactEmail}.
         </p>
       </section>
@@ -30,8 +30,8 @@ export default function PrivacyPage() {
             (tally.so), not by this website, and Tally collects and stores your
             answers. See{" "}
             <a
-              href="https://tally.so/privacy-policy"
-              className="font-bold text-link underline decoration-2 underline-offset-4"
+              href="https://tally.so/help/privacy-policy"
+              className="font-bold text-teal underline decoration-2 underline-offset-4"
             >
               Tally&apos;s privacy policy
             </a>
@@ -64,26 +64,19 @@ export default function PrivacyPage() {
         </p>
         <p>
           When you submit the sign-up form, the email you gave and the ad-click
-          ID are sent to Meta. Two things send it: the thank-you page you land
-          on after submitting, through the Meta Pixel in your browser, and our
-          server, through the Meta Conversions API. The server sends a hashed
-          (scrambled, not readable) version of your email address, the ad-click
-          identifier (&ldquo;fbc&rdquo;) and Meta&apos;s browser identifier
-          (&ldquo;fbp&rdquo;) if you have them, a hashed random click ID, the
-          page the signup is for, and the ID of your form submission. It does
-          not send your IP address or browser type from the server. Meta uses
-          this to match the signup to an ad and to show our ads to people like
-          you. Meta&apos;s use of the data is covered by its own privacy policy.
-          You can turn off ad personalization in your Facebook and Instagram
-          settings, or block the Pixel in your browser, and you can still join
-          the waitlist.
+          ID are sent to Meta. It does not send your IP address or browser type
+          from the server. Meta uses this to match the signup to an ad and to 
+          show our ads to people like you. Meta&apos;s use of the data is covered
+          by its own privacy policy. You can turn off ad personalization in your 
+          Facebook and Instagram settings, or block the Pixel in your browser, 
+          and you can still join the waitlist.
         </p>
       </section>
 
       <section>
         <h2>How we use it</h2>
         <p>
-          To tell you about FamilyIT, invite you to early access, and shape what
+          To tell you about Mamo, invite you to early access, and shape what
           we build around the people on the list. We do not sell your
           information. Apart from the signup report to Meta described above, we
           do not share it with third parties for their own marketing.

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
-import type { SegmentId } from "@/content/audiences";
+import type { PageSegmentId } from "@/content/audiences";
 import { variants } from "@/content/variants";
 
 /** Title, description, canonical and share card text for one segment page. */
-export function variantMetadata(id: SegmentId): Metadata {
+export function variantMetadata(id: PageSegmentId): Metadata {
   const { meta, path } = variants[id];
   return {
     title: meta.title,

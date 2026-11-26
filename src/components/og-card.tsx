@@ -1,12 +1,14 @@
 import { siteConfig } from "@/config/site";
+import { MARK_PATH } from "@/components/icons";
 
-/** The three-circle mark, as inline SVG for Satori. */
-function HelperMark({ size }: { size: number }) {
+/** The Mamo blob face, as inline SVG for Satori. */
+function HelperMark({ size, fill = "#113c42", face = "#ffffff" }: { size: number; fill?: string; face?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width={size} height={size}>
-      <circle cx="74" cy="124" r="68" fill="#c9d6cb" />
-      <circle cx="134" cy="112" r="56" fill="#244b43" stroke="#fbfaf7" strokeWidth="5" />
-      <circle cx="104" cy="62" r="34" fill="#7c3c5c" stroke="#fbfaf7" strokeWidth="5" />
+      <path d={MARK_PATH} fill={fill} />
+      <circle cx="86" cy="104" r="7" fill={face} />
+      <circle cx="126" cy="100" r="7.5" fill={face} />
+      <path d="M90 126 Q110 141 130 122" fill="none" stroke={face} strokeWidth="6" strokeLinecap="round" />
     </svg>
   );
 }
@@ -31,8 +33,8 @@ export function OgCard({
         height: "100%",
         display: "flex",
         padding: "64px 72px",
-        background: "#fbfaf7",
-        color: "#244b43",
+        background: "#edebe2",
+        color: "#113c42",
         fontFamily: "sans-serif",
       }}
     >
@@ -45,10 +47,10 @@ export function OgCard({
           paddingRight: 48,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <HelperMark size={64} />
-          <div style={{ fontSize: 40, fontWeight: 700 }}>{siteConfig.name}</div>
-          <div style={{ fontSize: 28, color: "#4c5a57", marginLeft: 12 }}>{kicker}</div>
+          <div style={{ fontSize: 44, fontWeight: 700, letterSpacing: -1.5 }}>mamo</div>
+          <div style={{ fontSize: 28, color: "#2b4c51", marginLeft: 12 }}>{kicker}</div>
         </div>
 
         <div
@@ -68,14 +70,14 @@ export function OgCard({
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: 26,
-            color: "#4c5a57",
+            color: "#2b4c51",
           }}
         >
           <div>{siteConfig.tagline}</div>
           <div
             style={{
-              background: "#7c3c5c",
-              color: "#ffffff",
+              background: "#eedc5b",
+              color: "#113c42",
               borderRadius: 999,
               padding: "14px 28px",
               fontWeight: 700,
@@ -89,8 +91,19 @@ export function OgCard({
         </div>
       </div>
 
-      <div style={{ display: "flex", alignSelf: "center" }}>
-        <HelperMark size={300} />
+      <div
+        style={{
+          display: "flex",
+          alignSelf: "center",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 340,
+          height: 340,
+          borderRadius: 170,
+          background: "#eedc5b",
+        }}
+      >
+        <HelperMark size={260} />
       </div>
     </div>
   );

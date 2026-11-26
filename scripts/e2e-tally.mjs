@@ -110,13 +110,18 @@ async function main() {
   server = await startServer({ META_CAPI_DRY_RUN: "1", SIGNUPS_FILE_NAME: "tally-e2e.ndjson", TALLY_SIGNING_SECRET: SECRET });
   try {
     // Pages: no on-site form, a button to the right Tally form.
-    for (const [segment] of Object.entries(FORM_IDS)) {
-      const html = await (await fetch(`${BASE}/${segment}`)).text();
-      check(`/${segment} has no <form>`, !/<form[\s>]/i.test(html));
+    // "/" has no audience, so its buttons open the families form.
+    for (const [page, segment] of [["families", "families"], ["seniors", "seniors"], ["", "families"]]) {
+      const html = await (await fetch(`${BASE}/${page}`)).text();
+      check(`/${page} has no <form>`, !/<form[\s>]/i.test(html));
       const hrefs = [...html.matchAll(/href="(https:\/\/tally\.so\/r\/[^"]+)"/g)].map((m) => m[1].replaceAll("&amp;", "&"));
-      check(`/${segment} has a Tally button with segment=${segment}`, hrefs.length > 0 && hrefs.every((h) => h.includes(`segment=${segment}`) && h.includes(FORM_IDS[segment])), hrefs.join(" | "));
-      check(`/${segment} does not mention the Meta Lead on load`, !/"Lead"/.test(html));
+      check(`/${page} has a Tally button with segment=${segment}`, hrefs.length > 0 && hrefs.every((h) => h.includes(`segment=${segment}`) && h.includes(FORM_IDS[segment])), hrefs.join(" | "));
+      check(`/${page} does not mention the Meta Lead on load`, !/"Lead"/.test(html));
+      check(`/${page} says Mamo, not FamilyIT`, /Mamo/.test(html) && !/FamilyIT/.test(html));
     }
+    // The retired page redirects to the home page.
+    const gone = await fetch(`${BASE}/senior-living`, { redirect: "manual" });
+    check("/senior-living redirects to /", [301, 307, 308].includes(gone.status) && new URL(gone.headers.get("location") ?? "", BASE).pathname === "/", `${gone.status} ${gone.headers.get("location")}`);
 
     // Signature checks.
     const good = body({ submissionId: "sub1", email: "Person@Example.org", fbc, fbp, clickId });
@@ -160,6 +165,11 @@ async function main() {
     const organicRow = lines(SIGNUPS).find((r) => r.submissionId === "sub3");
     check("form id decides the segment; no ad click is not counted", organicRow?.segment === "seniors" && organicRow?.counted === false && organicRow?.paid === false, JSON.stringify(organicRow));
 
+    // The retired senior-living form is still accepted, so late submissions are logged.
+    const retired = await post(body({ submissionId: "sub3b", email: "late@example.org", segment: "senior-living", formId: FORM_IDS["senior-living"] }));
+    const retiredRow = lines(SIGNUPS).find((r) => r.submissionId === "sub3b");
+    check("retired senior-living form is still logged", retired.status === 200 && retiredRow?.segment === "senior-living", JSON.stringify(retiredRow));
+
     // Unknown form, other event type.
     const unknown = await post(body({ submissionId: "sub4", email: "x@example.org", formId: "SOMEOTHERFORM" }));
     check("unknown form is ignored", unknown.status === 200 && unknown.json.ignored === "unknown form" && !lines(SIGNUPS).some((r) => r.submissionId === "sub4"), JSON.stringify(unknown));
@@ -176,6 +186,7 @@ async function main() {
     check("/thanks is noindex", /noindex/.test(thanks));
     const sitemap = await (await fetch(`${BASE}/sitemap.xml`)).text();
     check("sitemap leaves out /thanks", !sitemap.includes("/thanks"));
+    check("sitemap leaves out /senior-living", !sitemap.includes("/senior-living"));
   } finally {
     await stop(server);
     clean();

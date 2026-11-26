@@ -35,7 +35,7 @@ export default function TermsPage() {
       <section>
         <h2>Accuracy</h2>
         <p>
-          We describe FamilyIT as we intend to build it. Features, regions and pricing are subject
+          We describe Mamo as we intend to build it. Features, regions and pricing are subject
           to change, and nothing on this site is professional, medical or legal advice.
         </p>
       </section>

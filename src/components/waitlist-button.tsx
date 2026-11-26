@@ -1,8 +1,7 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { siteConfig } from "@/config/site";
-import type { Variant } from "@/content/variants";
+import type { SegmentId } from "@/content/audiences";
 import { pickFbc, pickFbp } from "@/lib/attribution";
 import { tallyFormUrl } from "@/lib/tally";
 
@@ -15,12 +14,33 @@ function makeClickId(): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
+/**
+ * Looks of the button, from the mockups:
+ * - `sun`: yellow, for use on a teal card or band
+ * - `teal`: solid teal, for the sand page and the header
+ * - `outline`: white with a teal border, the second pricing card
+ */
+export type WaitlistTone = "sun" | "teal" | "outline";
+
+const tones: Record<WaitlistTone, string> = {
+  sun: "border-2 border-sun bg-sun text-teal hover:border-sun-deep hover:bg-sun-deep",
+  teal: "border-2 border-teal bg-teal text-white hover:bg-teal-soft",
+  outline: "border-2 border-teal bg-white text-teal hover:bg-sand",
+};
+
+const sizes = {
+  sm: "min-h-12 px-5 text-base sm:px-6",
+  lg: "min-h-[3.75rem] px-8 text-lg",
+};
+
 type Props = {
-  variant: Variant;
-  /** Which button on the page this is (hero or closing). */
-  placement: "hero" | "closing";
-  /** "dark" for the pine band. */
-  tone?: "light" | "dark";
+  /** Which Tally form it opens. Pages without an audience use "families". */
+  segment: SegmentId;
+  /** Where on the page this button is. Written to `data-placement` for tests and reports. */
+  placement: "header" | "hero" | "pricing" | "closing";
+  tone?: WaitlistTone;
+  size?: keyof typeof sizes;
+  label?: string;
   className?: string;
 };
 
@@ -34,15 +54,21 @@ type Props = {
  * hidden Tally fields. No Meta event fires on click: a signup is a submitted
  * form, and the thank-you page and the webhook report it.
  */
-export function WaitlistButton({ variant, placement, tone = "light", className = "" }: Props) {
-  const baseHref = tallyFormUrl(variant.id);
-  const dark = tone === "dark";
+export function WaitlistButton({
+  segment,
+  placement,
+  tone = "teal",
+  size = "lg",
+  label = "Join the waitlist",
+  className = "",
+}: Props) {
+  const baseHref = tallyFormUrl(segment);
 
   // Runs for click (also keyboard), middle click and the context menu, so
   // "open in new tab" carries the fields too. The browser reads `href` after this.
   const addFields = (event: MouseEvent<HTMLAnchorElement>) => {
     try {
-      event.currentTarget.href = tallyFormUrl(variant.id, {
+      event.currentTarget.href = tallyFormUrl(segment, {
         fbc: pickFbc(document.cookie),
         fbp: pickFbp(document.cookie),
         clickId: makeClickId(),
@@ -53,24 +79,17 @@ export function WaitlistButton({ variant, placement, tone = "light", className =
   };
 
   return (
-    <div className={`flex flex-col ${className}`}>
-      <a
-        href={baseHref}
-        onClick={addFields}
-        onAuxClick={addFields}
-        onContextMenu={addFields}
-        data-testid="waitlist-button"
-        data-placement={placement}
-        data-segment={variant.id}
-        className={`inline-flex min-h-14 items-center justify-center rounded-full bg-plum px-7 text-lg font-bold text-white transition-colors hover:bg-plum-deep sm:w-fit ${
-          dark ? "border-2 border-paper/70" : ""
-        }`}
-      >
-        {placement === "closing" ? variant.closing.cta : variant.hero.cta}
-      </a>
-      <p className={`mt-3 text-base ${dark ? "text-paper/85" : "text-ink-soft"}`}>
-        {siteConfig.waitlist.buttonNote}
-      </p>
-    </div>
+    <a
+      href={baseHref}
+      onClick={addFields}
+      onAuxClick={addFields}
+      onContextMenu={addFields}
+      data-testid="waitlist-button"
+      data-placement={placement}
+      data-segment={segment}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-full font-bold transition-colors ${sizes[size]} ${tones[tone]} ${className}`}
+    >
+      {label}
+    </a>
   );
 }

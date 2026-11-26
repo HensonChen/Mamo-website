@@ -1,83 +1,110 @@
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { WaitlistButton } from "@/components/waitlist-button";
-import { Container } from "@/components/ui";
-import type { Variant } from "@/content/variants";
+import { siteConfig } from "@/config/site";
+import type { SegmentId } from "@/content/audiences";
+
+type Pebble = {
+  /** Photo in /public. Without one the pebble is a plain color. */
+  src?: string;
+  /** CSS object-position for the photo. */
+  position?: string;
+  /** Shape class from globals.css. */
+  shape: string;
+  /**
+   * Placement. Below `md` only two pebbles show, tucked into the corners; `md`
+   * shows three; `lg` shows all five where the mockup puts them. Widths are
+   * percentages of the card so the layout scales with it.
+   */
+  className: string;
+};
+
+/** The five pebbles of the hero card, in the mockup's positions. */
+const pebbles: Pebble[] = [
+  {
+    // Pink, no photo.
+    shape: "blob-a bg-blush",
+    className:
+      "hidden lg:block lg:bottom-[97px] lg:left-[-8.5%] lg:aspect-[206/182] lg:w-[16.7%]",
+  },
+  {
+    src: "/images/mamo/photo-couple-tablet.jpg",
+    position: "right",
+    shape: "blob-c",
+    className:
+      "hidden md:block md:-right-10 md:-top-10 md:h-40 md:w-44 lg:right-[-4.1%] lg:top-[-15px] lg:h-auto lg:aspect-[274/265] lg:w-[22.2%]",
+  },
+  {
+    src: "/images/mamo/photo-elder-laptop-couch.jpg",
+    position: "center",
+    shape: "blob-b",
+    className:
+      "hidden lg:block lg:bottom-[-41px] lg:left-[7.9%] lg:aspect-[227/211] lg:w-[18.4%]",
+  },
+  {
+    src: "/images/mamo/photo-senior-woman-tablet.jpg",
+    position: "bottom",
+    shape: "blob-d",
+    className:
+      "-left-8 -top-8 h-28 w-24 md:-left-10 md:-top-10 md:h-44 md:w-36 lg:left-[-4.7%] lg:top-[-30px] lg:h-auto lg:aspect-[283/340] lg:w-[23%]",
+  },
+  {
+    src: "/images/mamo/photo-man-tablet.jpg",
+    position: "center",
+    shape: "blob-c",
+    className:
+      "-bottom-10 -right-8 h-28 w-24 md:-right-6 md:h-44 md:w-40 lg:bottom-[28px] lg:right-[2.4%] lg:h-auto lg:aspect-[225/251] lg:w-[18.3%]",
+  },
+];
 
 /**
- * First screen of each segment page: the promise, the price and the one
- * button. From `md` the photo sits behind the copy the way the mockup's
- * background shorthand does, with a paper fade on the left so the words stay
- * readable. On a phone the copy and the button come first and the photo is a
- * rounded picture below them, so the button is on the first screen.
- *
- * The section slides up under the transparent header (negative margin and
- * matching top padding).
+ * First screen of each page: a teal card with the promise, the one button and
+ * photo "pebbles" around the edges. The pebbles are decoration (empty alt),
+ * kept clear of the words by scaling with the card and by dropping from five
+ * to three to two as the screen narrows.
  */
-export function Hero({ variant }: { variant: Variant }) {
-  const { hero } = variant;
-  const { image } = hero;
-  const cover = image.size === "cover";
-  const [posX = "50%", posY = "50%"] = image.position.split(" ");
-
+export function Hero({
+  heading,
+  lede,
+  segment,
+}: {
+  heading: string;
+  lede: string;
+  /** Which Tally form the button opens. */
+  segment: SegmentId;
+}) {
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="relative -mt-[4.5rem] overflow-hidden pt-[4.5rem] md:flex md:min-h-[34rem] md:items-center md:pb-16 md:pt-[8.5rem]"
-    >
-      <Container className="relative z-10 pb-0 pt-6 md:py-0">
-        <div className="md:max-w-[58%]">
+    <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-[80rem] px-3 pt-1 sm:px-6 sm:pt-2">
+      <div className="on-teal relative flex min-h-[30rem] items-center justify-center overflow-hidden rounded-[2rem] bg-teal px-6 py-24 sm:rounded-[2.5rem] md:min-h-[36rem] md:px-12 md:py-28 lg:min-h-[38.75rem]">
+        {pebbles.map((pebble, index) => (
+          <div
+            key={index}
+            aria-hidden="true"
+            className={`absolute overflow-hidden ${pebble.shape} ${pebble.className}`}
+          >
+            {pebble.src ? (
+              <Image
+                src={pebble.src}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 280px, 180px"
+                className="object-cover"
+                style={{ objectPosition: pebble.position }}
+              />
+            ) : null}
+          </div>
+        ))}
+
+        <div className="relative z-10 flex max-w-[42.5rem] flex-col lg:max-w-[36rem] xl:max-w-[42.5rem] items-center gap-5 text-center lg:gap-[22px]">
           <h1
             id="hero-heading"
-            className="max-w-[18ch] text-display font-bold text-balance text-pine lg:text-display-lg"
+            className="text-display font-bold text-white lg:text-[3.5rem] lg:leading-[1.02] lg:tracking-[-0.03em] xl:text-display-lg"
           >
-            {hero.headline}
+            {heading}
           </h1>
-          <p className="mt-5 max-w-[50ch] text-xl leading-relaxed text-ink-soft sm:text-[1.375rem]">
-            {hero.lede}
-          </p>
-          <div className="mt-5 space-y-1 text-xl font-bold text-pine">
-            {hero.priceLines.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
-          <WaitlistButton variant={variant} placement="hero" className="mt-8" />
+          <p className="max-w-[38.75rem] text-lg leading-normal text-white/85 sm:text-xl">{lede}</p>
+          <WaitlistButton segment={segment} placement="hero" tone="sun" className="mt-1" />
+          <p className="text-sm text-white/85">{siteConfig.product.heroNote}</p>
         </div>
-      </Container>
-
-      <div className="relative mx-5 mb-12 mt-10 aspect-[4/3] overflow-hidden rounded-3xl sm:mx-10 md:absolute md:inset-0 md:mx-0 md:my-0 md:aspect-auto md:rounded-none">
-        <div
-          className="hero-frame"
-          data-fit={cover ? "cover" : "position"}
-          style={
-            {
-              "--pos-m": image.mobilePosition,
-              "--pos-d": image.position,
-              "--pos-x": posX,
-              "--pos-y": posY,
-              "--hero-w": cover ? "100%" : image.size.split(" ")[0],
-            } as CSSProperties
-          }
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            width={image.width}
-            height={image.height}
-            preload
-            sizes={
-              image.size.startsWith("140%")
-                ? "(min-width: 768px) 140vw, 90vw"
-                : "(min-width: 768px) 100vw, 90vw"
-            }
-            className="hero-photo"
-          />
-        </div>
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 hidden md:block"
-          style={{ backgroundImage: `linear-gradient(90deg, ${image.fade})` }}
-        />
       </div>
     </section>
   );

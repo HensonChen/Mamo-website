@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible } from "next/font/google";
+import { Figtree } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { siteGraph } from "@/lib/structured-data";
 import { JsonLd } from "@/components/json-ld";
@@ -9,10 +9,9 @@ import { MetaPixel } from "@/components/meta-pixel";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-// One typeface for everything. Designed by the Braille Institute for
-// low-vision readers, which fits an audience that includes older adults.
-const body = Atkinson_Hyperlegible({
-  weight: ["400", "700"],
+// One typeface for everything, from the Mamo mockups.
+const body = Figtree({
+  weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
@@ -32,10 +31,9 @@ export const metadata: Metadata = {
     "tech help for seniors",
     "tech support for elderly parents",
     "voice AI assistant for older adults",
-    "help parents with passwords",
-    "senior living technology",
-    "resident tech support",
+    "help parents with tech",
     "family tech support waitlist",
+    "Mamo",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
@@ -71,7 +69,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#244b43",
+  themeColor: "#113c42",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -89,7 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-plum focus:px-5 focus:py-3 focus:text-xl focus:font-bold focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-teal focus:px-5 focus:py-3 focus:text-xl focus:font-bold focus:text-white"
         >
           Skip to main content
         </a>
