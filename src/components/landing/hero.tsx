@@ -25,14 +25,14 @@ const pebbles: Pebble[] = [
     // Pink, no photo.
     shape: "blob-a bg-blush",
     className:
-      "block bottom-1 -right-2 w-[18%] aspect-[115/100] md:right-auto md:-bottom-8 md:-left-2 md:w-[24%] lg:block lg:bottom-[97px] lg:left-[-8.5%] lg:aspect-[206/182] lg:w-[16.7%]",
+      "hidden sm:block bottom-3 -right-2 w-[18%] aspect-[115/100] md:right-auto md:-bottom-8 md:-left-2 md:w-[24%] lg:block lg:bottom-[97px] lg:left-[-8.5%] lg:aspect-[206/182] lg:w-[16.7%]",
   },
   {
     src: "/images/mamo/photo-couple-tablet.jpg",
     focus: "max-lg:object-[center_40%] lg:object-right",
     shape: "blob-c",
     className:
-      "-right-1 -top-1 h-24 w-24 md:block md:-right-2 md:-top-2 md:h-36 md:w-32 lg:right-[-4.1%] lg:top-[-15px] lg:h-auto lg:aspect-[274/265] lg:w-[22.2%]",
+      "-right-1 -top-2 h-24 w-24 sm:-top-1 md:block md:-right-2 md:-top-2 md:h-36 md:w-32 lg:right-[-4.1%] lg:top-[-15px] lg:h-auto lg:aspect-[274/265] lg:w-[22.2%]",
   },
   {
     src: "/images/mamo/photo-elder-laptop-couch.jpg",
@@ -45,14 +45,14 @@ const pebbles: Pebble[] = [
     focus: "max-lg:object-[center_70%] lg:object-bottom",
     shape: "blob-d",
     className:
-      "-left-1 -top-1 h-20 w-20 sm:h-24 sm:w-24 md:-left-2 md:-top-2 md:h-36 md:w-32 lg:left-[-4.7%] lg:top-[-30px] lg:h-auto lg:aspect-[283/340] lg:w-[23%]",
+      "hidden sm:block -left-1 -top-1 h-20 w-20 sm:h-24 sm:w-24 md:-left-2 md:-top-2 md:h-36 md:w-32 lg:left-[-4.7%] lg:top-[-30px] lg:h-auto lg:aspect-[283/340] lg:w-[23%]",
   },
   {
     src: "/images/mamo/photo-man-tablet.jpg",
     focus: "max-lg:object-[center_32%]",
     shape: "blob-c",
     className:
-      "-bottom-2 left-4 h-26 w-24 md:left-auto lg:left-auto md:bottom-2 md:right-4 md:h-42 md:w-38 lg:bottom-[28px] lg:right-[2.4%] lg:h-auto lg:aspect-[225/251] lg:w-[18.3%]",
+      "-bottom-4 left-4 h-26 w-24 sm:-bottom-2 md:left-auto lg:left-auto md:bottom-2 md:right-4 md:h-42 md:w-38 lg:bottom-[28px] lg:right-[2.4%] lg:h-auto lg:aspect-[225/251] lg:w-[18.3%]",
   },
 ];
 
