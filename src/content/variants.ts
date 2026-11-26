@@ -239,7 +239,7 @@ export const variants: Record<PageSegmentId, Variant> = {
     ],
     closing: {
       heading: "Be the first to try Mamo",
-      sub: "Get early access when we launch in early 2027. No charge today.",
+      sub: "Get early access when we launch in early 2027. Free to join.",
     },
   },
 
@@ -401,7 +401,7 @@ export const variants: Record<PageSegmentId, Variant> = {
     ],
     closing: {
       heading: "Be the first to try Mamo",
-      sub: "Get early access for your family when we launch in early 2027. No charge today.",
+      sub: "Get early access for your family when we launch in early 2027. Free to join.",
     },
   },
 };
